@@ -73,6 +73,9 @@
       var ctx = { hoursPerDay: hoursPerDay, workdaysPerMonth: workdaysPerMonth, stdMonthlyHours: stdMonthly };
       var add = { overheadPct: overheadRaw.value, techPct: techRaw.value, directExpense: expenseRaw.value, vatMode: vatMode };
       var est = estimate(rows, ctx, add);
+      if (!isFinite(est.labor) || !isFinite(est.subtotal) || !isFinite(est.grandTotal) || !isFinite(est.totalMH)) {
+        throw new Error('계산 결과가 너무 큽니다. 입력값을 줄여서 다시 시도해 주세요.');
+      }
       render(rows, est, ctx, add);
     } catch (e) {
       errorEl.textContent = e.message;
@@ -95,7 +98,7 @@
         '<td>' + formatMD(est.rows[i].md) + '</td><td>' + formatMM(est.rows[i].mm) + '</td>' +
         '<td>' + formatKRW(est.rows[i].cost) + '</td></tr>';
     }
-    html += '<tr class="total"><td>합계</td><td colspan="4">프로젝트 기간 ' + est.periodDays + '근무일 (가장 긴 투입 기간 기준) · 총공수 ' + formatMD(est.totalMD) + 'MD</td>' +
+    html += '<tr class="total"><td>합계</td><td colspan="4">최장 인력 투입기간 ' + est.periodDays + '근무일 · 총공수 ' + formatMD(est.totalMD) + 'MD</td>' +
       '<td>' + formatMD(est.totalMD) + '</td><td>' + formatMM(est.totalMM) + '</td><td>' + formatKRW(est.labor) + '</td></tr>';
     html += '</tbody></table>';
 
@@ -104,25 +107,26 @@
     html += '<tr><td>제경비 (직접 인건비 × ' + add.overheadPct + '%)</td><td>' + formatKRW(est.overhead) + '</td></tr>';
     html += '<tr><td>기술료 ((직접 인건비 + 제경비) × ' + add.techPct + '%)</td><td>' + formatKRW(est.tech) + '</td></tr>';
     html += '<tr><td>직접경비 (직접 입력)</td><td>' + formatKRW(est.directExpense) + '</td></tr>';
-    html += '<tr><td>소계</td><td>' + formatKRW(est.subtotal) + '</td></tr>';
     if (add.vatMode === 'included') {
-      html += '<tr><td>부가가치세 (총합에 포함, 내포 세액)</td><td>' + formatKRW(est.vat) + '</td></tr>';
+      html += '<tr><td>공급가액 (부가세 포함 금액에서 역산)</td><td>' + formatKRW(est.subtotal - est.vat) + '</td></tr>';
+      html += '<tr><td>부가가치세 (내포 세액)</td><td>' + formatKRW(est.vat) + '</td></tr>';
     } else {
-      html += '<tr><td>부가가치세 (별도)</td><td>' + formatKRW(est.vat) + '</td></tr>';
+      html += '<tr><td>공급가액</td><td>' + formatKRW(est.subtotal) + '</td></tr>';
+      html += '<tr><td>부가가치세 (10% 가산)</td><td>' + formatKRW(est.vat) + '</td></tr>';
     }
-    html += '<tr class="total"><td>총합 (참고값)</td><td>' + formatKRW(est.grandTotal) + '원</td></tr>';
+    html += '<tr class="total"><td>최종 견적금액 (부가세 포함)</td><td>' + formatKRW(est.grandTotal) + '원</td></tr>';
     html += '</tbody></table>';
     html += assumptionList(ctx, add);
     resultEl.innerHTML = html;
   }
 
   function assumptionList(ctx, add) {
-    var vatText = add.vatMode === 'included' ? '총합에 포함 (세율 10%, 내포 세액으로 표시)' : '별도 표시 (세율 10%)';
+    var vatText = add.vatMode === 'included' ? '입력 금액에 포함된 것으로 보고 역산 (세율 10%)' : '공급가액에 10% 가산';
     return '<p class="assumption">적용한 가정: 월 기준시간 ' + formatMH(ctx.stdMonthlyHours) + '시간 ' +
       '(기준 하루 근무시간 ' + ctx.hoursPerDay + '시간 × 월 근무일 ' + ctx.workdaysPerMonth + '일), ' +
       '월단가는 투입 개월(근무일 ÷ 월 근무일 ' + ctx.workdaysPerMonth + '일)로 환산, ' +
       '제경비 ' + add.overheadPct + '%, 기술료 ' + add.techPct + '%, 직접경비 ' + formatKRW(add.directExpense) + '원, ' +
-      '부가가치세 ' + vatText + '. 프로젝트 기간은 인력 중 가장 긴 투입 기간으로 표시했습니다.</p>';
+      '부가가치세 ' + vatText + '. 최장 인력 투입기간은 개별 인력의 투입 기간 중 가장 긴 기간이며, 인력 간 작업 순서와 일정 중첩은 고려하지 않으므로 전체 프로젝트 수행기간과 다를 수 있습니다.</p>';
   }
 
   function escapeHtml(s) {

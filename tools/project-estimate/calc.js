@@ -43,7 +43,8 @@ function estimate(rows, ctx, add) {
     out.totalMD += r.md;
     out.totalMH += r.mh;
     out.labor += r.cost;
-    if (rows[i].days > out.periodDays) out.periodDays = rows[i].days;
+    // 최장 인력 투입기간은 실제로 참여하는(참여율 0% 초과) 인력만으로 정한다 (2026-10-19 GPT 검수 P2 반영).
+    if (rows[i].ratePct > 0 && rows[i].days > out.periodDays) out.periodDays = rows[i].days;
   }
   out.totalMM = ctx.stdMonthlyHours > 0 ? out.totalMH / ctx.stdMonthlyHours : NaN;
   out.overhead = out.labor * (add.overheadPct / 100);
@@ -93,13 +94,10 @@ function parseOptional(raw, label) {
   return parseField(raw, label);
 }
 
+// 가산 요율(제경비·기술료)용: 빈 칸이면 0. 참여율과 달리 100% 상한을 두지 않는다.
+// 제경비율은 실무 기준이 110~150%라 100%를 넘을 수 있다 (2026-10-19 GPT 검수 지적, 당일 정정).
 function parseOptionalRate(raw, label) {
-  var r = parseOptional(raw, label);
-  if (!r.ok) return r;
-  if (r.value > 100) {
-    return { ok: false, message: label + '은(는) 100%를 넘을 수 없습니다.' };
-  }
-  return r;
+  return parseOptional(raw, label);
 }
 
 // 표시 단계에서만 반올림한다. 내부 계산은 반올림하지 않는다.
