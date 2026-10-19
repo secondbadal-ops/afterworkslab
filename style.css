@@ -1,0 +1,31 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: -apple-system, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; color: #1a1a1a; line-height: 1.65; background: #fff; }
+.site-header { padding: 14px 20px; border-bottom: 1px solid #e5e5e5; font-weight: 700; }
+.site-header a, .site-footer a { color: #1a1a1a; text-decoration: none; }
+.site-footer { padding: 18px 20px; border-top: 1px solid #e5e5e5; color: #666; font-size: 14px; margin-top: 40px; }
+main { max-width: 760px; margin: 0 auto; padding: 24px 20px 8px; }
+h1 { font-size: 26px; margin: 8px 0 14px; }
+h2 { font-size: 19px; margin: 26px 0 10px; }
+.calculator { border: 1px solid #ddd; border-radius: 10px; padding: 18px; background: #fafafa; }
+fieldset { border: 1px solid #e0e0e0; border-radius: 8px; margin: 0 0 14px; padding: 12px; background: #fff; }
+legend { font-weight: 700; padding: 0 6px; }
+label { display: inline-block; margin: 4px 14px 4px 0; font-size: 14px; }
+input[type="text"] { width: 90px; padding: 7px 8px; border: 1px solid #bbb; border-radius: 6px; font-size: 15px; margin-left: 6px; }
+.note { font-size: 13px; color: #555; margin: 8px 0 0; }
+table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 14px; }
+th, td { border: 1px solid #ddd; padding: 7px 8px; text-align: left; }
+th { background: #f2f2f2; }
+.input-table input { width: 70px; margin: 0; }
+button { padding: 8px 14px; border: 1px solid #bbb; border-radius: 6px; background: #fff; cursor: pointer; font-size: 14px; }
+button.primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; font-weight: 700; padding: 10px 22px; }
+.error { color: #c00; font-weight: 600; min-height: 1.2em; }
+.result { margin-top: 14px; }
+.result-table .total td { font-weight: 700; background: #f7f7f7; }
+.assumption { font-size: 13px; color: #555; }
+.no-input { font-weight: 600; }
+.disclaimer { font-size: 13px; color: #555; border-top: 1px solid #eee; margin-top: 30px; padding-top: 6px; }
+.tool-list { list-style: none; padding: 0; }
+.tool-list li { border: 1px solid #e0e0e0; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+.tool-list a { font-weight: 700; color: #0b57d0; text-decoration: none; }
+.coming { color: #888; font-weight: 700; }
+@media (max-width: 560px) { input[type="text"] { width: 72px; } .input-table input { width: 56px; } }
