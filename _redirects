@@ -1,0 +1,7 @@
+/sitemap_index.xml /sitemap.xml 301
+/wp-admin/* / 301
+/wp-login.php / 301
+/wp-content/* / 301
+/wp-includes/* / 301
+/feed / 301
+/comments/feed / 301
