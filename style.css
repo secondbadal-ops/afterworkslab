@@ -16,6 +16,10 @@ table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 14px;
 th, td { border: 1px solid #ddd; padding: 7px 8px; text-align: left; }
 th { background: #f2f2f2; }
 .input-table input { width: 70px; margin: 0; }
+.input-table input.wide { width: 130px; }
+input.wide { width: 130px; }
+select { padding: 7px 6px; border: 1px solid #bbb; border-radius: 6px; font-size: 14px; background: #fff; }
+input[type="radio"] { margin-right: 4px; }
 button { padding: 8px 14px; border: 1px solid #bbb; border-radius: 6px; background: #fff; cursor: pointer; font-size: 14px; }
 button.primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; font-weight: 700; padding: 10px 22px; }
 .error { color: #c00; font-weight: 600; min-height: 1.2em; }
