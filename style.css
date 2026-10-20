@@ -33,3 +33,31 @@ button.primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; font-w
 .tool-list a { font-weight: 700; color: #0b57d0; text-decoration: none; }
 .coming { color: #888; font-weight: 700; }
 @media (max-width: 560px) { input[type="text"] { width: 72px; } .input-table input { width: 56px; } }
+
+/* 실사용 UI 요소 (2026-10-20 찰리 기준: 프로토타입도 완성품 수준) */
+textarea { width: 100%; padding: 12px; border: 1px solid #bbb; border-radius: 8px; font: inherit; font-size: 15px; line-height: 1.6; resize: vertical; background: #fff; }
+textarea:focus, input[type="text"]:focus, select:focus { outline: 2px solid #2563eb; outline-offset: 1px; border-color: #2563eb; }
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0 4px; }
+.stat { background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 12px 8px; text-align: center; }
+.stat .num { display: block; font-size: 22px; font-weight: 800; line-height: 1.25; }
+.stat .lbl { font-size: 12.5px; color: #555; }
+.stat.primary { background: #1a1a1a; border-color: #1a1a1a; color: #fff; }
+.stat.primary .lbl { color: #ccc; }
+.tool-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.tool-actions .feedback { font-size: 13px; color: #087f23; font-weight: 600; }
+.target-box { margin-top: 16px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; }
+.target-box label { font-weight: 600; }
+.target-status { font-size: 14px; font-weight: 700; margin: 8px 0 0; }
+.target-status.ok { color: #087f23; }
+.target-status.over { color: #c00; }
+.progress { height: 8px; background: #eee; border-radius: 4px; margin-top: 8px; overflow: hidden; }
+.progress-bar { height: 100%; width: 0; background: #2563eb; transition: width .15s ease; }
+.progress-bar.over { background: #c00; }
+@media (max-width: 560px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* P1 도구 요약 카드·FAQ (2026-10-20 추가 — 기존 선택자 무변경, 추가만) */
+.stat-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.summary .stat .num { overflow-wrap: break-word; }
+.faq h3 { font-size: 15.5px; margin: 16px 0 4px; }
+.faq p { margin: 0 0 10px; }
+@media (max-width: 560px) { .stat-grid-3 { grid-template-columns: repeat(3, 1fr); } .stat-grid-3 .num { font-size: 15px; } .stat-grid-3 .stat { padding: 10px 4px; } }
