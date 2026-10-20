@@ -1,0 +1,27 @@
+name: Daily check
+
+on:
+  schedule:
+    # 매일 09:00 KST (00:00 UTC). GitHub 사정으로 지연·누락될 수 있으며, 실행 기록이 없으면 성공으로 보지 않는다.
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run calculator checks
+        run: node checks/run-checks.mjs
+      - name: Check live site
+        run: |
+          for url in https://afterworkslab.com/ https://afterworkslab.com/tools/mm-mh/ https://afterworkslab.com/tools/project-estimate/ https://afterworkslab.com/sitemap.xml https://afterworkslab.com/robots.txt; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$url")
+            echo "$code $url"
+            if [ "$code" != "200" ]; then exit 1; fi
+          done
+          curl -s https://afterworkslab.com/tools/mm-mh/calc.js | grep -q 'LIMITS' || { echo 'live mm-mh calc.js missing LIMITS (deploy pending?)'; exit 1; }
+          curl -s https://afterworkslab.com/tools/project-estimate/calc.js | grep -q 'LIMITS' || { echo 'live project-estimate calc.js missing LIMITS (deploy pending?)'; exit 1; }
