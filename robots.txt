@@ -1,5 +1,40 @@
-User-agent: *
+# Afterwork Lab — AI 크롤러 정책 (2026-10-20)
+# 방침: 인용·검색 유입이 목표이므로 학습·검색 색인·실시간 fetch 전부 허용한다.
+
+# 학습용 크롤러
+User-agent: GPTBot
 Allow: /
 
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+# 검색 색인용 크롤러
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# 실시간 fetch (사용자 질문에 답할 때 페이지를 읽는 봇)
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: *
+Allow: /
 
 Sitemap: https://afterworkslab.com/sitemap.xml
