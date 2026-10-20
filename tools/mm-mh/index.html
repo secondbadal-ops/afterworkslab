@@ -7,7 +7,7 @@
 <meta name="description" content="인원, 근무일, 하루 근무시간, 참여율을 넣으면 총 투입시간(MH), 인월(MM), 총공수(MD)를 계산합니다. 월 기준시간은 하루 근무시간과 월 근무일로 정하는 방식을 그대로 보여 줍니다.">
 <link rel="canonical" href="https://afterworkslab.com/tools/mm-mh/">
 <link rel="stylesheet" href="/style.css">
-  <meta property="og:type" content="website">
+<meta property="og:type" content="website">
 <meta property="og:site_name" content="Afterwork Lab">
 <meta property="og:title" content="MM·MH 공수 변환 계산기 — 인월·인시 환산 | Afterwork Lab">
 <meta property="og:description" content="인원, 근무일, 하루 근무시간, 참여율을 넣으면 총 투입시간(MH), 인월(MM), 총공수(MD)를 계산합니다. 월 기준시간은 하루 근무시간과 월 근무일로 정하는 방식을 그대로 보여 줍니다.">
@@ -15,6 +15,9 @@
 <meta name="twitter:card" content="summary">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebApplication","name":"MM·MH 공수 변환 계산기","url":"https://afterworkslab.com/tools/mm-mh/","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"MM(맨먼스)과 MH(맨아워)는 어떻게 변환하나요?","acceptedAnswer":{"@type":"Answer","text":"MH를 월 기준시간으로 나누면 MM이 됩니다. 월 기준시간은 하루 근무시간에 월 근무일을 곱한 값입니다. 예를 들어 총 투입시간이 320MH이고 월 기준시간이 160시간이면 2MM입니다."}},{"@type":"Question","name":"1MM은 몇 MH인가요?","acceptedAnswer":{"@type":"Answer","text":"기준에 따라 다릅니다. 하루 8시간, 월 근무일 20일을 기준으로 하면 1MM은 160MH입니다. 월 근무일이 21일이면 168MH, 22일이면 176MH가 됩니다."}},{"@type":"Question","name":"MD(맨데이)와 MM은 어떻게 다른가요?","acceptedAnswer":{"@type":"Answer","text":"MD는 사람 1명이 하루 투입되는 양(인일), MM은 사람 1명이 한 달 투입되는 양(인월)입니다. 2명이 10일 일하면 기간은 10근무일이지만 총공수는 20MD입니다."}},{"@type":"Question","name":"참여율은 어떻게 계산에 반영되나요?","acceptedAnswer":{"@type":"Answer","text":"그 인력이 실제로 투입하는 시간의 비율만큼 곱합니다. 1명이 20일, 하루 8시간, 참여율 50%로 투입되면 160MH가 아니라 80MH로 계산됩니다."}}]}
 </script>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-RK33Z9GQX3"></script>
@@ -24,7 +27,6 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-RK33Z9GQX3');
 </script>
-
 </head>
 <body>
 <header class="site-header"><a href="/">Afterwork Lab</a></header>
@@ -53,6 +55,21 @@ gtag('config', 'G-RK33Z9GQX3');
 <button type="submit" class="primary">공수 계산</button>
 <p id="error" class="error" role="alert"></p>
 </form>
+<div class="tool-actions">
+<button type="button" id="load-example">예시 입력 채우기</button>
+<button type="button" id="reset-input">입력 초기화</button>
+</div>
+<div id="summary" class="summary" hidden>
+<div class="stat-grid stat-grid-3">
+<div class="stat primary"><span class="num" id="sum-mh">-</span><span class="lbl">총 투입시간 (MH)</span></div>
+<div class="stat"><span class="num" id="sum-mm">-</span><span class="lbl">총 인월 (MM)</span></div>
+<div class="stat"><span class="num" id="sum-md">-</span><span class="lbl">총공수 (MD)</span></div>
+</div>
+<div class="tool-actions">
+<button type="button" id="copy-result">결과 복사</button>
+<span class="feedback" id="copy-feedback"></span>
+</div>
+</div>
 <div id="result" class="result"></div>
 </section>
 
@@ -113,12 +130,24 @@ gtag('config', 'G-RK33Z9GQX3');
 </ul>
 </section>
 
+<section class="faq">
+<h2>자주 묻는 질문</h2>
+<h3>MM(맨먼스)과 MH(맨아워)는 어떻게 변환하나요?</h3>
+<p>MH를 월 기준시간으로 나누면 MM이 됩니다. 월 기준시간은 하루 근무시간에 월 근무일을 곱한 값입니다. 예를 들어 총 투입시간이 320MH이고 월 기준시간이 160시간이면 2MM입니다. 변환 비율이 하나로 고정돼 있지 않은 이유는 한 달 근무시간의 기준이 회사와 프로젝트마다 다르기 때문입니다.</p>
+<h3>1MM은 몇 MH인가요?</h3>
+<p>기준에 따라 다릅니다. 하루 8시간, 월 근무일 20일을 기준으로 하면 1MM은 160MH입니다. 월 근무일이 21일이면 168MH, 22일이면 176MH가 됩니다. 그래서 MM과 MH를 변환할 때는 기준 월 근무시간을 함께 적는 것이 안전합니다.</p>
+<h3>MD(맨데이)와 MM은 어떻게 다른가요?</h3>
+<p>MD는 사람 1명이 하루 투입되는 양(인일), MM은 사람 1명이 한 달 투입되는 양(인월)입니다. 이 계산기는 투입을 MH로 합산한 뒤 월 기준시간으로 나눠 MM을 구하고, MD는 인원 × 근무일 × 참여율로 따로 합산해 함께 보여 줍니다. 프로젝트 기간과 총공수가 다른 값이라는 점도 주의할 부분입니다. 2명이 10일 일하면 기간은 10근무일이지만 총공수는 20MD입니다.</p>
+<h3>참여율은 어떻게 계산에 반영되나요?</h3>
+<p>그 인력이 실제로 투입하는 시간의 비율만큼 곱합니다. 1명이 20일, 하루 8시간, 참여율 50%로 투입되면 160MH가 아니라 80MH로 계산됩니다. 인력마다 참여율이 다르면 행을 나눠서 각각 입력하면 됩니다.</p>
+</section>
+
 <section class="disclaimer">
 <h2>참고 사항</h2>
 <p>이 계산 결과는 입력하신 인원·기간·참여율과 화면에 표시된 가정을 바탕으로 한 참고용 추정치입니다. 실제 투입과 정산은 근무 조건과 계약 기준에 따라 달라질 수 있으며, 이 도구와 운영자는 결과의 정확성이나 특정 거래에서의 사용 적합성을 보장하지 않습니다.</p>
 </section>
 </main>
-<footer class="site-footer"><a href="/">Afterwork Lab</a> · <a href="/tools/project-estimate/">프로젝트 견적 시뮬레이터</a></footer>
+<footer class="site-footer"><a href="/">Afterwork Lab</a> · <a href="/tools/project-estimate/">프로젝트 견적 시뮬레이터</a> · <a href="/tools/char-count/">글자수 세기</a></footer>
 <script src="calc.js"></script>
 <script src="page.js"></script>
 </body>
