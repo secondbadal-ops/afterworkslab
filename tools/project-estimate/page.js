@@ -3,6 +3,9 @@
   var rowsEl = document.getElementById('rows');
   var resultEl = document.getElementById('result');
   var errorEl = document.getElementById('error');
+  var summaryEl = document.getElementById('summary');
+  var feedbackEl = document.getElementById('copy-feedback');
+  var lastCopyText = '';
 
   var BASIS_LABEL = { hour: '시간당', day: '일당', month: '월단가' };
 
@@ -41,6 +44,9 @@
     ev.preventDefault();
     errorEl.textContent = '';
     resultEl.innerHTML = '';
+    summaryEl.hidden = true;
+    lastCopyText = '';
+    feedbackEl.textContent = '';
     try {
       var hoursPerDay = readField(document.getElementById('std-hours'), '기준 하루 근무시간', LIMITS.hoursPerDay);
       var workdaysPerMonth = readField(document.getElementById('workdays'), '월 근무일', LIMITS.workdaysPerMonth);
@@ -85,10 +91,32 @@
 
   function render(rows, est, ctx, add) {
     if (est.totalMD === 0) {
+      summaryEl.hidden = true;
+      lastCopyText = '';
       resultEl.innerHTML = '<p class="no-input">투입이 없습니다. 인원과 근무일을 입력하면 공수와 인건비가 계산됩니다.</p>' +
         assumptionList(ctx, add);
       return;
     }
+    var supply = add.vatMode === 'included' ? est.subtotal - est.vat : est.subtotal;
+    document.getElementById('sum-total').textContent = formatKRW(est.grandTotal);
+    document.getElementById('sum-supply').textContent = formatKRW(supply);
+    document.getElementById('sum-labor').textContent = formatKRW(est.labor);
+    document.getElementById('sum-mm').textContent = formatMM(est.totalMM);
+    summaryEl.hidden = false;
+    var lines = ['프로젝트 견적 시뮬레이션 결과 (참고값, 월 기준시간 ' + formatMH(ctx.stdMonthlyHours) + '시간)'];
+    for (var j = 0; j < rows.length; j++) {
+      lines.push('- ' + rows[j].name + ': ' + rows[j].count + '명, ' + rows[j].days + '일, 참여율 ' + rows[j].ratePct + '%, ' + BASIS_LABEL[rows[j].rateBasis] + ' ' + formatKRW(rows[j].unitPrice) + '원 → ' + formatMD(est.rows[j].md) + ' MD / ' + formatMM(est.rows[j].mm) + ' MM / ' + formatKRW(est.rows[j].cost) + '원');
+    }
+    lines.push('직접 인건비: ' + formatKRW(est.labor) + '원');
+    lines.push('제경비 (' + add.overheadPct + '%): ' + formatKRW(est.overhead) + '원');
+    lines.push('기술료 (' + add.techPct + '%): ' + formatKRW(est.tech) + '원');
+    lines.push('직접경비: ' + formatKRW(est.directExpense) + '원');
+    lines.push('공급가액: ' + formatKRW(supply) + '원');
+    lines.push('부가가치세: ' + formatKRW(est.vat) + '원' + (add.vatMode === 'included' ? ' (포함 금액에서 역산)' : ' (10% 가산)'));
+    lines.push('최종 견적금액 (부가세 포함): ' + formatKRW(est.grandTotal) + '원');
+    lines.push('총공수: ' + formatMD(est.totalMD) + ' MD · ' + formatMM(est.totalMM) + ' MM · 최장 인력 투입기간 ' + est.periodDays + '근무일');
+    lines.push('※ 입력값 기준 참고용 추정치입니다. 실제 계약금액은 조건에 따라 달라질 수 있습니다.');
+    lastCopyText = lines.join('\n');
     var html = '<table class="result-table"><thead><tr>' +
       '<th>역할</th><th>인원</th><th>근무일</th><th>참여율</th><th>단가</th><th>공수(MD)</th><th>공수(MM)</th><th>인건비(원)</th>' +
       '</tr></thead><tbody>';
@@ -133,6 +161,62 @@
   function escapeHtml(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+
+  document.getElementById('copy-result').addEventListener('click', function () {
+    if (!lastCopyText) {
+      feedbackEl.textContent = '먼저 계산해 주세요.';
+      return;
+    }
+    function done() {
+      feedbackEl.textContent = '결과를 복사했습니다.';
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(lastCopyText).then(done, function () {
+        feedbackEl.textContent = '복사에 실패했습니다.';
+      });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = lastCopyText;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        done();
+      } catch (e) {
+        feedbackEl.textContent = '복사에 실패했습니다.';
+      }
+      ta.remove();
+    }
+  });
+
+  document.getElementById('load-example').addEventListener('click', function () {
+    document.getElementById('std-hours').value = '8';
+    document.getElementById('workdays').value = '20';
+    rowsEl.innerHTML = '';
+    addRow({ name: '개발', count: '2', days: '20', basis: 'hour', price: '50000', rate: '100' });
+    addRow({ name: 'PM', count: '1', days: '40', basis: 'month', price: '8000000', rate: '50' });
+    document.getElementById('overhead').value = '10';
+    document.getElementById('tech').value = '10';
+    document.getElementById('direct-expense').value = '500000';
+    document.querySelector('input[name="vat"][value="separate"]').checked = true;
+    document.getElementById('calc-form').requestSubmit();
+  });
+
+  document.getElementById('reset-input').addEventListener('click', function () {
+    document.getElementById('std-hours').value = '8';
+    document.getElementById('workdays').value = '20';
+    rowsEl.innerHTML = '';
+    addRow({ name: '개발', count: '2', days: '20', basis: 'hour', price: '50000', rate: '100' });
+    document.getElementById('overhead').value = '';
+    document.getElementById('tech').value = '';
+    document.getElementById('direct-expense').value = '';
+    document.querySelector('input[name="vat"][value="separate"]').checked = true;
+    errorEl.textContent = '';
+    resultEl.innerHTML = '';
+    summaryEl.hidden = true;
+    lastCopyText = '';
+    feedbackEl.textContent = '';
+  });
 
   addRow({ name: '개발', count: '2', days: '20', basis: 'hour', price: '50000', rate: '100' });
 })();
