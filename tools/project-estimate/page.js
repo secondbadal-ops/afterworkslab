@@ -31,8 +31,8 @@
     addRow({ basis: 'hour', rate: '100' });
   });
 
-  function readField(input, label) {
-    var r = parseField(input.value, label);
+  function readField(input, label, max) {
+    var r = parseField(input.value, label, max);
     if (!r.ok) throw new Error(r.message);
     return r.value;
   }
@@ -42,23 +42,24 @@
     errorEl.textContent = '';
     resultEl.innerHTML = '';
     try {
-      var hoursPerDay = readField(document.getElementById('std-hours'), '기준 하루 근무시간');
-      var workdaysPerMonth = readField(document.getElementById('workdays'), '월 근무일');
+      var hoursPerDay = readField(document.getElementById('std-hours'), '기준 하루 근무시간', LIMITS.hoursPerDay);
+      var workdaysPerMonth = readField(document.getElementById('workdays'), '월 근무일', LIMITS.workdaysPerMonth);
       var stdMonthly = monthlyStandardHours(hoursPerDay, workdaysPerMonth);
       if (stdMonthly === 0) {
         throw new Error('월 기준시간이 0이면 MM으로 변환할 수 없습니다. 기준 하루 근무시간과 월 근무일을 확인해 주세요.');
       }
       var trs = rowsEl.querySelectorAll('tr');
       if (trs.length === 0) throw new Error('인력 행을 하나 이상 추가해 주세요.');
+      if (trs.length > LIMITS.maxRows) throw new Error('인력 행은 ' + LIMITS.maxRows + '개까지만 입력할 수 있습니다.');
       var rows = [];
       for (var i = 0; i < trs.length; i++) {
         var t = trs[i];
         var label = (i + 1) + '번째 인력의 ';
         var name = t.querySelector('.f-name').value.trim() || (i + 1) + '번째 인력';
-        var count = readField(t.querySelector('.f-count'), label + '인원');
-        var days = readField(t.querySelector('.f-days'), label + '근무일');
+        var count = readField(t.querySelector('.f-count'), label + '인원', LIMITS.count);
+        var days = readField(t.querySelector('.f-days'), label + '근무일', LIMITS.days);
         var basis = t.querySelector('.f-basis').value;
-        var price = readField(t.querySelector('.f-price'), label + '단가');
+        var price = readField(t.querySelector('.f-price'), label + '단가', LIMITS.unitPrice);
         var rateRaw = parseRate(t.querySelector('.f-rate').value);
         if (!rateRaw.ok) throw new Error(label + rateRaw.message);
         rows.push({ name: name, count: count, days: days, rateBasis: basis, unitPrice: price, ratePct: rateRaw.value });
@@ -67,7 +68,7 @@
       if (!overheadRaw.ok) throw new Error(overheadRaw.message);
       var techRaw = parseOptionalRate(document.getElementById('tech').value, '기술료 요율');
       if (!techRaw.ok) throw new Error(techRaw.message);
-      var expenseRaw = parseOptional(document.getElementById('direct-expense').value, '직접경비');
+      var expenseRaw = parseOptional(document.getElementById('direct-expense').value, '직접경비', LIMITS.directExpense);
       if (!expenseRaw.ok) throw new Error(expenseRaw.message);
       var vatMode = document.querySelector('input[name="vat"]:checked').value;
       var ctx = { hoursPerDay: hoursPerDay, workdaysPerMonth: workdaysPerMonth, stdMonthlyHours: stdMonthly };
