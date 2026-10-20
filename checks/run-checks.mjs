@@ -51,6 +51,15 @@ eq('A 빈 칸 오류', a.parseField('', '인원').ok, false);
 eq('B 참여율 100 초과 오류', b.parseRate('101').ok, false);
 eq('B 제경비 120% 정상', b.parseOptionalRate('120', '제경비 요율').value, 120);
 
+// P2 글자수 세기 (2026-10-20 추가, 규칙: p2-charcount-rules-1020.md)
+const cc = require('../tools/char-count/count.js');
+let c1 = cc.countText('안녕하세요');
+eq('P2 한글 공백포함', c1.charsWithSpace, 5); eq('P2 한글 바이트', c1.bytesUtf8, 15);
+let c2 = cc.countText('가\r\n나');
+eq('P2 CRLF 정규화', c2.charsWithSpace, 3); eq('P2 단어수', c2.words, 2);
+let c3 = cc.countText('😀😀 테스트 중입니다!');
+eq('P2 이모지 포함', c3.charsWithSpace, 12); eq('P2 이모지 제외', c3.charsWithoutSpace, 10);
+
 console.log('---');
 console.log('daily-check pass=' + pass + ' fail=' + fail);
 process.exit(fail ? 1 : 0);
