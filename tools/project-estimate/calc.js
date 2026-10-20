@@ -61,9 +61,21 @@ function estimate(rows, ctx, add) {
   return out;
 }
 
+// 입력값 상한 (U-5, 2026-10-20 찰리 확정 — 비정상 입력 방지용 넉넉한 상한. 도구 A와 공통 항목은 같은 값)
+var LIMITS = {
+  count: 1000,            // 인원(명)
+  days: 3660,             // 근무일(일) — 약 10년치
+  hoursPerDay: 24,        // 기준 하루 근무시간
+  workdaysPerMonth: 31,   // 월 근무일
+  unitPrice: 10000000000, // 단가 100억 원
+  directExpense: 100000000000, // 직접경비 1,000억 원
+  maxRows: 100            // 인력 행 수
+};
+
 // 입력 검증. 값은 문자열 그대로 받는다 (자동으로 글자를 떼어 내고 계산하지 않는다). 도구 A와 같은 규칙.
+// max를 주면 상한 검증까지 한다 (U-5).
 // 반환: {ok:true, value:number} 또는 {ok:false, message:string}
-function parseField(raw, label) {
+function parseField(raw, label, max) {
   if (raw === null || raw === undefined || String(raw).trim() === '') {
     return { ok: false, message: label + '을(를) 입력해 주세요.' };
   }
@@ -73,6 +85,9 @@ function parseField(raw, label) {
   }
   if (v < 0) {
     return { ok: false, message: label + '은(는) 음수가 될 수 없습니다.' };
+  }
+  if (max !== undefined && v > max) {
+    return { ok: false, message: label + '은(는) ' + max.toLocaleString('ko-KR') + ' 이하로 입력해 주세요.' };
   }
   return { ok: true, value: v };
 }
@@ -87,11 +102,11 @@ function parseRate(raw) {
 }
 
 // 선택 항목용: 빈 칸이면 0으로 본다 (가산 항목 기본값 0 규칙). 값이 있으면 같은 검증 규칙을 적용한다.
-function parseOptional(raw, label) {
+function parseOptional(raw, label, max) {
   if (raw === null || raw === undefined || String(raw).trim() === '') {
     return { ok: true, value: 0 };
   }
-  return parseField(raw, label);
+  return parseField(raw, label, max);
 }
 
 // 가산 요율(제경비·기술료)용: 빈 칸이면 0. 참여율과 달리 100% 상한을 두지 않는다.
@@ -117,6 +132,7 @@ function formatMD(v) {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     VAT_RATE: VAT_RATE,
+    LIMITS: LIMITS,
     monthlyStandardHours: monthlyStandardHours,
     rowCost: rowCost,
     estimate: estimate,
