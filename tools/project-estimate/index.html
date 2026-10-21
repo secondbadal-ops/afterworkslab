@@ -32,18 +32,11 @@ gtag('config', 'G-RK33Z9GQX3');
 <header class="site-header"><a href="/">Afterwork Lab</a></header>
 <main>
 <h1>프로젝트 견적 시뮬레이터</h1>
-<p>참여 인원, 투입 기간, 인력별 단가, 참여율을 넣으면 총 공수와 총 인건비, 견적을 이루는 구성 요소별 금액을 계산합니다. 단가는 시간당, 일당, 월단가 중 인력마다 골라서 넣을 수 있습니다.</p>
-<p>인력별 투입공수와 단가로 IT 프로젝트의 예상 견적금액을 계산합니다. 사용자 입력값을 기준으로 계산하며, 특정 공공사업 대가기준을 자동 적용하지는 않습니다. 실제 견적서나 계약 금액을 만들어 주는 도구가 아니며, 적용한 가정은 결과 아래에 그대로 표시됩니다.</p>
+<p>참여 인원, 투입 기간, 인력별 단가, 참여율을 넣으면 총 공수와 총 인건비, 견적을 이루는 구성 요소별 금액을 계산합니다. 단가는 시간당, 일당, 월단가 중 인력마다 골라서 넣을 수 있습니다. 특정 공공사업 대가기준을 자동 적용하지 않는 참고용 계산기이며, 적용한 가정은 결과 아래에 그대로 표시됩니다.</p>
 
 <section class="calculator">
 <h2>계산하기</h2>
 <form id="calc-form">
-<fieldset>
-<legend>월 기준 (MM 변환과 월단가 환산 기준)</legend>
-<label>기준 하루 근무시간(시간) <input type="text" inputmode="decimal" id="std-hours" value="8"></label>
-<label>월 근무일(일) <input type="text" inputmode="numeric" id="workdays" value="20"></label>
-<p class="note">월 기준시간 = 기준 하루 근무시간 × 월 근무일. 기본값은 8시간 × 20일 = 160시간입니다. 월단가의 투입 개월도 근무일 ÷ 월 근무일로 환산합니다. 월 근무일 기본값 20일은 환산을 위한 편의상 가정입니다. 모든 달의 법정 근무일이 20일이라는 뜻은 아닙니다.</p>
-</fieldset>
 <fieldset>
 <legend>인력별 투입</legend>
 <table class="input-table">
@@ -52,6 +45,14 @@ gtag('config', 'G-RK33Z9GQX3');
 </table>
 <button type="button" id="add-row">인력 행 추가</button>
 <p class="note">시간당·일당·월단가는 동일한 투입공수를 서로 다른 단위로 계산하는 방식입니다. 입력 단가에 제경비나 이윤이 이미 포함되어 있는 경우, 추가 요율 적용 시 비용이 중복 반영될 수 있습니다.</p>
+</fieldset>
+<details class="settings-fold">
+<summary>상세 견적 설정 — 월 기준·가산 항목 (기본값으로 계산하려면 펼치지 않아도 됩니다)</summary>
+<fieldset>
+<legend>월 기준 (MM 변환과 월단가 환산 기준)</legend>
+<label>기준 하루 근무시간(시간) <input type="text" inputmode="decimal" id="std-hours" value="8"></label>
+<label>월 근무일(일) <input type="text" inputmode="numeric" id="workdays" value="20"></label>
+<p class="note">월 기준시간 = 기준 하루 근무시간 × 월 근무일. 기본값은 8시간 × 20일 = 160시간입니다. 월단가의 투입 개월도 근무일 ÷ 월 근무일로 환산합니다. 월 근무일 기본값 20일은 환산을 위한 편의상 가정입니다. 모든 달의 법정 근무일이 20일이라는 뜻은 아닙니다.</p>
 </fieldset>
 <fieldset>
 <legend>가산 항목 (선택 — 입력하지 않으면 0)</legend>
@@ -64,6 +65,7 @@ gtag('config', 'G-RK33Z9GQX3');
 <label><input type="radio" name="vat" value="included"> 입력 금액에 포함된 부가세 10/110 역산</label>
 <p class="note">부가가치세 세율은 10%입니다. '가산'은 입력 금액으로 산출한 합계를 공급가액으로 보고 부가세를 더합니다. '역산'은 입력 단가와 경비로 산출한 합계가 부가세 포함 금액이라고 가정하여 공급가액과 부가세를 역산합니다. 최종 합계에 부가세를 추가하지 않습니다.</p>
 </fieldset>
+</details>
 <button type="submit" class="primary">견적 계산</button>
 <p id="error" class="error" role="alert"></p>
 </form>
