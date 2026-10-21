@@ -210,7 +210,7 @@
         var hasCombo = br.all.some(function (c) { return c.start <= lastDate && c.end >= firstDate; });
         var title = grid.year + '년 ' + grid.month + '월';
         if (hasCombo) out += '<div class="month-card"><h4>' + title + '</h4>' + monthGridHtml(grid) + '</div>';
-        else out += '<details class="month-fold"><summary>' + title + ' — 추천 연휴 없음</summary>' + monthGridHtml(grid) + '</details>';
+        else out += '<details class="month-fold"><summary>' + title + '</summary>' + monthGridHtml(grid) + '</details>';
       }
       return out;
     }
