@@ -153,6 +153,8 @@ function calculate(input) {
   return {
     status: 'ok',
     mode: input.mode,
+    hire: fmtDate(hire),
+    end: fmtDate(end),
     events: eventRows,
     totalAccrued: totalAccrued,
     usedDays: input.usedDays || 0,
@@ -167,6 +169,36 @@ function calculate(input) {
     netAllowance: net,
     warnings: warnings
   };
+}
+
+// ---------- 발생 달력 (표시 전용 — 계산 의미는 바꾸지 않는다) ----------
+// 입사 월부터 기준일(마지막 근무일) 월까지의 월 셀 배열을 만든다.
+// events는 calculate()의 결과 행(accrualDate 'YYYY-MM-DD' 문자열) 또는 buildEvents 원형(Date) 모두 받는다.
+// 반환 셀: {ym, year, month, accruals: [{date, days, period}], monthDays, cumulative}
+function buildCalendar(hireStr, endStr, events) {
+  var hire = parseDate(hireStr), end = parseDate(endStr);
+  if (!hire || !end || cmpDate(end, hire) < 0) return [];
+  var rows = (events || []).map(function (e) {
+    return {
+      date: typeof e.accrualDate === 'string' ? e.accrualDate : fmtDate(e.accrualDate),
+      days: e.days, period: e.period
+    };
+  });
+  rows.sort(function (a, b) { return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); });
+  function p2(n) { return (n < 10 ? '0' : '') + n; }
+  var cells = [], cumulative = 0;
+  var y = hire.getUTCFullYear(), mo = hire.getUTCMonth() + 1;
+  var endY = end.getUTCFullYear(), endMo = end.getUTCMonth() + 1;
+  while (y < endY || (y === endY && mo <= endMo)) {
+    var ym = y + '-' + p2(mo);
+    var accruals = rows.filter(function (r) { return r.date.slice(0, 7) === ym; });
+    var monthDays = 0;
+    accruals.forEach(function (a) { monthDays += a.days; });
+    cumulative += monthDays;
+    cells.push({ ym: ym, year: y, month: mo, accruals: accruals, monthDays: monthDays, cumulative: cumulative });
+    mo++; if (mo > 12) { mo = 1; y++; }
+  }
+  return cells;
 }
 
 // ---------- 표시 정책 (규칙 §5-3: 원값 보존 + 4종 표시) ----------
@@ -204,7 +236,7 @@ if (typeof module !== 'undefined' && module.exports) {
     OLD_RULE_CUTOFF: OLD_RULE_CUTOFF,
     parseDate: parseDate, fmtDate: fmtDate, addMonths: addMonths, addYears: addYears, addDays: addDays,
     annualDaysForYear: annualDaysForYear, monthlyStandardHours: monthlyStandardHours,
-    buildEvents: buildEvents, calculate: calculate,
+    buildEvents: buildEvents, calculate: calculate, buildCalendar: buildCalendar,
     applyDayPolicy: applyDayPolicy, formatDays: formatDays, formatWon: formatWon, parseField: parseField
   };
 }
