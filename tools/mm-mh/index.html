@@ -32,11 +32,17 @@ gtag('config', 'G-RK33Z9GQX3');
 <header class="site-header"><a href="/">Afterwork Lab</a></header>
 <main>
 <h1>MM·MH 공수 변환 계산기</h1>
-<p>MM(Man-Month, 인월)은 사람 1명이 한 달 동안 투입되는 양을 나타내는 단위이고, MH(Man-Hour, 인시)는 사람 1명이 1시간 투입되는 양을 나타내는 단위입니다. 이 계산기는 인원, 근무일, 하루 근무시간, 참여율을 넣으면 총 투입시간(MH), 인월(MM), 총공수(MD), 인력별 공수를 계산합니다.</p>
-<p>MM과 MH 사이의 변환 비율은 정해진 상수가 아닙니다. 한 달에 몇 시간을 일하는가 하는 기준이 있어야 변환할 수 있어서, 이 계산기는 그 기준을 숨기지 않고 입력값으로 드러냅니다.</p>
+<p>MM(Man-Month, 인월)은 사람 1명이 한 달 동안 투입되는 양, MH(Man-Hour, 인시)는 사람 1명이 1시간 투입되는 양을 나타내는 단위입니다. 숫자 하나만 바꾸면 바로 환산되고, 인원·기간으로 짜는 상세 계산도 아래에서 할 수 있습니다.</p>
 
 <section class="calculator">
-<h2>계산하기</h2>
+<h2>빠른 변환</h2>
+<div class="quick-grid">
+<label>MM (인월) <input type="text" inputmode="decimal" id="quick-mm" placeholder="예: 2.5"></label>
+<label>MH (인시) <input type="text" inputmode="decimal" id="quick-mh" placeholder="예: 400"></label>
+<label>MD (인일) <input type="text" inputmode="decimal" id="quick-md" placeholder="예: 50"></label>
+</div>
+<p class="note" id="quick-base">기준: 1MM = 160.0MH, 1MD = 8MH (하루 8시간 × 월 20일). 기준은 아래 월 기준에서 바꿀 수 있습니다.</p>
+<h2>인력별 상세 계산</h2>
 <form id="calc-form">
 <fieldset>
 <legend>월 기준 (MM 변환 기준)</legend>
