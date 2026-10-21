@@ -130,3 +130,16 @@ details.year-details summary { cursor: pointer; font-weight: 800; font-size: 15.
   .mini-cals { grid-template-columns: repeat(3, 1fr); }
   .combo-card .range { font-size: 15.5px; }
 }
+
+/* 공통 디자인 틀 v2 (2026-10-21 — 전 도구 공통 카드·결과 숫자·표 통일, 페이지별 개성은 각 페이지가 유지) */
+.calculator { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+fieldset { border-color: var(--line); border-radius: 10px; }
+button.primary { border-radius: 10px; }
+.stat { border-color: var(--line); border-radius: var(--radius); }
+.stat.primary .num { font-size: 30px; }
+.result-table .total td { background: var(--brand-soft); }
+th { background: #f7f8fa; }
+.tool-list li { border-color: var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.site-header { border-bottom-color: var(--line); }
+.site-footer { border-top-color: var(--line); }
+@media (max-width: 560px) { .stat.primary .num { font-size: 24px; } }
