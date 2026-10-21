@@ -143,3 +143,20 @@ th { background: #f7f8fa; }
 .site-header { border-bottom-color: var(--line); }
 .site-footer { border-top-color: var(--line); }
 @media (max-width: 560px) { .stat.primary .num { font-size: 24px; } }
+
+/* 검토 반영 v3 (2026-10-21 — GPT·Gemini 실사용성 검토: 상세 설정 접기·모드 카드·빠른 변환) */
+details.settings-fold { margin: 14px 0; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; background: #fbfcfd; }
+details.settings-fold summary { cursor: pointer; font-weight: 700; font-size: 15px; padding: 4px 0; }
+details.settings-fold fieldset { margin-top: 12px; background: #fff; }
+.mode-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+.mode-card { display: block; border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; cursor: pointer; background: #fff; }
+.mode-card:has(input:checked) { border-color: var(--brand); background: var(--brand-soft); }
+.mode-card input { margin-right: 6px; }
+.mode-card-title { font-weight: 800; font-size: 16px; }
+.mode-card-desc { display: block; margin-top: 4px; font-size: 13px; color: #555; }
+.quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.quick-grid label { font-weight: 700; }
+@media (max-width: 560px) {
+  .mode-cards { grid-template-columns: 1fr; }
+  .quick-grid { grid-template-columns: 1fr; }
+}
