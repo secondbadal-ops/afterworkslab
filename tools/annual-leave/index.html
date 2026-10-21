@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>연차 계산기 — 퇴사할 때 남은 연차와 예상 수당 계산 | Afterwork Lab</title>
+<meta name="description" content="입사일과 마지막 근무일, 사용한 연차, 월 통상임금을 넣으면 퇴직 시 정산 대상 연차 일수와 미사용 연차수당 예상액을 계산합니다. 딱 1년 근무하고 퇴사하는 경우처럼 하루 차이로 갈리는 경계도 판례·행정해석 기준으로 반영합니다.">
+<link rel="canonical" href="https://afterworkslab.com/tools/annual-leave/">
+<link rel="stylesheet" href="/style.css">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Afterwork Lab">
+<meta property="og:title" content="연차 계산기 — 퇴사할 때 남은 연차와 예상 수당 계산 | Afterwork Lab">
+<meta property="og:description" content="입사일과 마지막 근무일, 사용한 연차, 월 통상임금을 넣으면 퇴직 시 정산 대상 연차 일수와 미사용 연차수당 예상액을 계산합니다.">
+<meta property="og:url" content="https://afterworkslab.com/tools/annual-leave/">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"연차 계산기 (퇴직 정산)","url":"https://afterworkslab.com/tools/annual-leave/","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"딱 1년만 근무하고 퇴사하면 연차수당은 며칠분인가요?","acceptedAnswer":{"@type":"Answer","text":"최대 11일분입니다. 대법원 판례(2021다227100)와 고용노동부 행정해석에 따르면 15일의 연차는 1년의 근로를 마친 다음 날 발생하므로, 365일만 근무하고 퇴직하면 15일은 발생하지 않습니다. 366일째까지 근로관계가 있으면 15일이 발생해 최대 26일분이 됩니다."}},{"@type":"Question","name":"연차수당은 어떻게 계산하나요?","acceptedAnswer":{"@type":"Answer","text":"남은 연차 일수에 1일 통상임금을 곱합니다. 1일 통상임금은 월 통상임금을 월 기준시간 수로 나눈 시간급에 1일 소정근로시간을 곱한 값입니다. 주 40시간 근무 기준으로 월 기준시간 수는 209시간이라, 1일 통상임금은 월 통상임금 ÷ 209 × 8로 계산합니다."}},{"@type":"Question","name":"연차를 시간 단위로 나눠 쓸 수 있나요?","acceptedAnswer":{"@type":"Answer","text":"시간 단위 연차 사용을 의무화하는 근로기준법 개정안이 통과돼 2027년 6월경 시행 예정입니다. 현재 이 계산기의 발생·정산 계산에는 반영되지 않습니다."}},{"@type":"Question","name":"회사가 연차 사용촉진을 했으면 수당을 못 받나요?","acceptedAnswer":{"@type":"Answer","text":"사용자가 법정 절차대로 서면 촉진을 했는데도 근로자가 쓰지 않아 소멸된 연차는 회사의 보상 의무가 없을 수 있습니다(근로기준법 제61조). 다만 퇴직 시점에 남아 있는 연차는 촉진과 무관하게 정산 대상이라는 해석도 있어, 개별 상황에 따라 달라집니다."}}]}
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RK33Z9GQX3"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-RK33Z9GQX3');
+</script>
+</head>
+<body>
+<header class="site-header"><a href="/">Afterwork Lab</a></header>
+<main>
+<h1>연차 계산기 — 퇴사할 때 남은 연차와 예상 수당</h1>
+<p>퇴사를 앞두고 있으면 남은 연차가 며칠이고, 못 쓴 연차수당을 얼마나 받을 수 있는지가 궁금해집니다. 이 계산기는 입사일 기준으로 발생한 연차를 날짜 단위로 쌓아 올리고, 사용한 일수를 빼서 정산 대상 일수와 예상 수당을 함께 보여 줍니다.</p>
+<p>연차는 "1년의 근로를 마친 다음 날"에 발생한다는 대법원 판례와 고용노동부 행정해석을 그대로 반영합니다. 그래서 딱 1년(365일) 근무한 경우와 하루 더 근무한 경우의 정산 일수가 15일 차이로 갈리는 경계까지 계산에 들어갑니다.</p>
+
+<section class="calculator">
+<h2>계산하기</h2>
+<form id="calc-form">
+<fieldset>
+<legend>무엇을 계산하나요</legend>
+<label><input type="radio" name="mode" value="retire" checked> 퇴직 정산 (마지막 근무일까지)</label>
+<label><input type="radio" name="mode" value="current"> 재직 중 잔여 확인 (오늘 기준)</label>
+</fieldset>
+<fieldset>
+<legend>기본 입력</legend>
+<label>입사일 <input type="date" id="hire-date"></label>
+<label><span id="end-label">마지막 근무일</span> <input type="date" id="end-date"></label>
+<p class="note">퇴직 정산에서는 퇴직일이 아니라 실제로 일한 마지막 날을 입력합니다. 회사 서류의 퇴직일(보통 마지막 근무일 다음 날)과 다르니 주의하세요.</p>
+<label>이미 사용한 연차(일) <input type="text" inputmode="decimal" id="used-days" value="0"></label>
+<label>월 통상임금(원, 선택) <input type="text" inputmode="numeric" id="monthly-wage" placeholder="예: 3000000"></label>
+<p class="note">통상임금은 기본급과 정기적·일률적으로 받는 고정수당, 정기상여금의 월 환산분을 합한 금액입니다. 재직 조건이 붙은 정기상여금도 포함될 수 있습니다. 비워 두면 일수만 계산합니다.</p>
+</fieldset>
+<fieldset>
+<legend>확인 사항</legend>
+<label>상시근로자 5인 이상 사업장인가요
+<select id="workers5">
+<option value="yes">예</option>
+<option value="no">아니오</option>
+<option value="unknown">모름</option>
+</select></label>
+<label>4주 평균 주 15시간 이상 근무하나요
+<select id="hours15">
+<option value="yes">예</option>
+<option value="no">아니오</option>
+<option value="unknown">모름</option>
+</select></label>
+<label>회사에서 연차 사용촉진을 서면으로 받았나요
+<select id="promotion">
+<option value="no">아니오</option>
+<option value="yes">예</option>
+</select></label>
+<label>이미 지급받은 미사용 연차수당(원) <input type="text" inputmode="numeric" id="prepaid" value="0"></label>
+</fieldset>
+<fieldset>
+<legend>고급 입력 (해당할 때만)</legend>
+<label>주 소정근로시간(시간) <input type="text" inputmode="decimal" id="weekly-hours" value="40"></label>
+<label>1일 소정근로시간(시간) <input type="text" inputmode="decimal" id="daily-hours" value="8"></label>
+<label>일수 표시 방식
+<select id="day-policy">
+<option value="1">원 계산값 (소수 첫째 자리)</option>
+<option value="2">0.5일 단위 올림</option>
+<option value="3">1일 단위 올림</option>
+<option value="4">정수 버림</option>
+</select></label>
+<label><input type="checkbox" id="suspension"> 휴직 등 근로관계가 멈춘 기간이 있었던 해가 있습니다</label>
+<table class="input-table">
+<thead><tr><th>출근율 80% 미만이었던 연차(몇 년차)</th><th>그해 개근한 개월 수</th><th></th></tr></thead>
+<tbody id="low-rows"></tbody>
+</table>
+<button type="button" id="add-low-row">출근율 80% 미만 연도 추가</button>
+<p class="note">출근율이 80% 미만인 해는 15일 대신, 그해 개근한 개월 수만큼(월 1일) 발생한 것으로 계산합니다(근로기준법 제60조 제2항).</p>
+</fieldset>
+<button type="submit" class="primary">연차 계산</button>
+<p id="error" class="error" role="alert"></p>
+</form>
+<div class="tool-actions">
+<button type="button" id="load-example">예시 입력 채우기</button>
+<button type="button" id="reset-input">입력 초기화</button>
+</div>
+<div id="summary" class="summary" hidden>
+<div class="stat-grid stat-grid-3">
+<div class="stat primary"><span class="num" id="sum-main">-</span><span class="lbl" id="sum-main-lbl">정산 대상 연차 (일)</span></div>
+<div class="stat"><span class="num" id="sum-sub1">-</span><span class="lbl" id="sum-sub1-lbl">예상 수당 (약)</span></div>
+<div class="stat"><span class="num" id="sum-sub2">-</span><span class="lbl" id="sum-sub2-lbl">1일 통상임금</span></div>
+</div>
+<div class="tool-actions">
+<button type="button" id="copy-result">결과 복사</button>
+<span class="feedback" id="copy-feedback"></span>
+</div>
+</div>
+<div id="result" class="result"></div>
+</section>
+
+<section>
+<h2>계산 방식</h2>
+<ul>
+<li><strong>1년 미만</strong>: 1개월을 개근할 때마다 다음 날 1일씩 발생합니다. 최대 11일까지입니다(근로기준법 제60조 제2항).</li>
+<li><strong>1년 이상</strong>: 근로연도를 마친 다음 날 15일이 발생합니다. 3년 이상부터는 2년마다 1일씩 가산돼 최대 25일까지 늘어납니다(제60조 제1항·제4항).</li>
+<li><strong>발생 인정 조건</strong>: 발생한 날에 근로관계가 있어야 합니다. 딱 365일만 근무하면 15일은 발생하지 않고, 366일째까지 일하면 발생합니다(대법원 2021다227100, 고용노동부 2021.12.16 행정해석 변경).</li>
+<li><strong>정산 대상</strong> = 마지막 근무일까지 발생한 연차 − 사용한 연차. 예상 수당 = 정산 대상 일수 × 1일 통상임금 − 이미 받은 수당.</li>
+<li><strong>1일 통상임금</strong> = 월 통상임금 ÷ 월 기준시간 수 × 1일 소정근로시간. 주 40시간 기준 월 기준시간 수는 209시간입니다.</li>
+<li>중간 계산은 반올림하지 않고, 최종 금액만 원 단위로 반올림합니다. 표시용 1일 통상임금도 반올림해 보여 주므로 표시값 × 일수와 예상액이 조금 다를 수 있습니다.</li>
+</ul>
+</section>
+
+<section>
+<h2>사용 예시</h2>
+<table class="example-table">
+<thead><tr><th>상황</th><th>입력</th><th>누적 발생</th><th>정산 대상</th></tr></thead>
+<tbody>
+<tr><td>2년 근속 후 퇴사</td><td>2024-03-04 입사, 2026-03-03 마지막 근무, 10일 사용, 월 통상임금 300만 원</td><td>26일</td><td>16일 (예상 수당 약 1,837,321원)</td></tr>
+<tr><td>딱 1년 근무</td><td>2025-01-01 입사, 2025-12-31 마지막 근무, 월 통상임금 260만 원</td><td>11일</td><td>11일 (약 1,094,737원)</td></tr>
+<tr><td>하루 더 근무</td><td>2025-01-01 입사, 2026-01-01 마지막 근무, 5일 사용</td><td>26일</td><td>21일 (약 2,089,952원)</td></tr>
+<tr><td>입사 6개월 차</td><td>2026-03-10 입사, 2026-08-20 마지막 근무, 1일 사용, 월 통상임금 220만 원</td><td>5일</td><td>4일 (약 336,842원)</td></tr>
+</tbody>
+</table>
+</section>
+
+<section>
+<h2>계산에 쓰이는 가정과 한계</h2>
+<ul>
+<li>입사일 기준으로 계산합니다. 회계연도(1월 1일) 기준으로 연차를 운영하는 회사는 부여 시점이 다를 수 있지만, 퇴직 시에는 입사일 기준으로 재산정해 모자란 분을 정산하는 것이 원칙입니다.</li>
+<li>전 기간 개근(출근율 80% 이상)을 기본으로 합니다. 출근율이 80% 미만이었던 해는 고급 입력에 그해 개근 개월 수를 넣으면 그만큼만 발생한 것으로 계산합니다.</li>
+<li>휴직 등 근로관계가 멈춘 기간이 있었던 해는 출근율 계산이 달라져 결과가 참고값이 됩니다. 업무상 재해 휴업·출산전후휴가·육아휴직은 법으로 출근한 것으로 보는 기간이고, 그 밖의 휴직·병가는 회사 규정에 따라 다릅니다.</li>
+<li>이미 사용기간이 지난 미사용 연차도 정산에 포함하는 간이 방식을 씁니다. 소멸 후 3년이 지난 수당은 시효로 청구할 수 없으니, 오래전에 소멸된 분이 크면 전문가 확인이 필요합니다.</li>
+<li>금액은 세전 기준 조건부 예상액입니다. 통상임금 범위, 회사의 평균임금 기준 여부, 소수점 처리 방식(법정 기준 없음)에 따라 실제 정산액은 달라질 수 있습니다.</li>
+<li>2017년 5월 29일 이전 입사자는 최초 1년 구간에 종전 규정이 적용될 수 있어, 현행 규정 기준인 이 결과와 최대 11일까지 차이가 날 수 있습니다.</li>
+</ul>
+</section>
+
+<section class="faq">
+<h2>자주 묻는 질문</h2>
+<h3>딱 1년만 근무하고 퇴사하면 연차수당은 며칠분인가요?</h3>
+<p>최대 11일분입니다. 15일의 연차는 1년의 근로를 마친 다음 날 발생한다는 것이 대법원 판례(2021다227100)와 고용노동부의 변경된 행정해석입니다. 365일만 근무하고 퇴직하면 그 '다음 날'에 근로관계가 없어 15일이 발생하지 않습니다. 366일째까지 근로관계가 있으면 15일이 발생해 최대 26일분까지 정산 대상이 됩니다.</p>
+<h3>연차수당은 어떻게 계산하나요?</h3>
+<p>남은 연차 일수에 1일 통상임금을 곱합니다. 1일 통상임금은 월 통상임금을 월 기준시간 수로 나눈 시간급에 1일 소정근로시간을 곱한 값입니다. 주 40시간 근무라면 월 기준시간 수가 209시간이라 1일 통상임금은 월 통상임금 ÷ 209 × 8이 됩니다. 근무시간이 다르면 기준시간 수도 달라집니다.</p>
+<h3>연차를 시간 단위로 나눠 쓸 수 있나요?</h3>
+<p>시간 단위 연차 사용을 의무화하는 근로기준법 개정안이 통과돼 2027년 6월경 시행 예정입니다. 노사가 합의하면 지금도 시간 단위로 쓸 수 있습니다. 이 계산기의 발생·정산 계산에는 아직 반영하지 않았습니다.</p>
+<h3>회사가 연차 사용촉진을 했으면 수당을 못 받나요?</h3>
+<p>회사가 법정 절차(6개월 전 서면 촉구 등)를 모두 지킨 경우, 촉구받고도 쓰지 않아 소멸된 연차는 보상 의무가 없을 수 있습니다(근로기준법 제61조). 다만 퇴직 시점에 남아 있는 연차는 촉진과 무관하게 정산 대상이라는 해석이 있어 단정할 수 없습니다. 이 도구는 촉진 여부를 표시만 하고 예상액을 0으로 단정하지 않습니다.</p>
+<h3>5인 미만 사업장이나 단시간 근무자는 어떻게 되나요?</h3>
+<p>상시근로자 5인 미만 사업장에는 법정 연차 규정이 적용되지 않고, 4주 평균 주 15시간 미만 근무자도 연차 적용에서 제외됩니다(근로기준법 제18조 제3항). 이런 경우 이 도구는 계산을 중단하고 안내만 보여 줍니다.</p>
+</section>
+
+<section class="disclaimer">
+<h2>참고 사항</h2>
+<p>이 계산 결과는 입력하신 날짜·일수·임금과 화면에 표시된 가정을 바탕으로 한 참고용 추정치입니다. 누적 발생에서 누적 사용을 뺀 단순 계산 모델이라, 과거에 이미 정산받은 연차나 임금채권 소멸시효(3년)가 지난 부분은 따로 반영하지 못합니다. 실제 정산은 회사의 취업규칙, 통상임금 범위, 사용촉진 절차 이행 여부에 따라 달라질 수 있으며, 이 도구와 운영자는 결과의 정확성이나 특정 거래에서의 사용 적합성을 보장하지 않습니다. 금액이 크거나 다툼이 예상되면 노무사 상담을 권합니다.</p>
+</section>
+</main>
+<footer class="site-footer"><a href="/">Afterwork Lab</a> · <a href="/tools/mm-mh/">MM·MH 공수 변환 계산기</a> · <a href="/tools/project-estimate/">프로젝트 견적 시뮬레이터</a> · <a href="/tools/char-count/">글자수 세기</a></footer>
+<script src="calc.js"></script>
+<script src="page.js"></script>
+</body>
+</html>
