@@ -141,12 +141,132 @@
     html += '</tbody></table>';
     html += '<p class="note">사용한 연차는 먼저 발생한 것부터 쓴 것으로 계산했습니다. 월 단위 연차의 사용기간은 최초 1년이 끝나는 날까지, 연 단위 연차는 발생한 날부터 1년입니다.</p>';
 
+    // 연차 사용 플래너 — "남은 연차로 가장 길게·효율적으로 쉬는 법"
+    var WD = ['일', '월', '화', '수', '목', '금', '토'];
+    function fmtMD(str) {
+      var d = parseDate(str);
+      return (d.getUTCMonth() + 1) + '/' + d.getUTCDate() + '(' + WD[d.getUTCDay()] + ')';
+    }
+    function shortHoliday(name) {
+      if (!name) return '';
+      if (name.indexOf('대체공휴일(') === 0) return '대체·' + name.slice(6, -1);
+      return name;
+    }
+    function breakCardHtml(c, label, isHero) {
+      var meta = '총 ' + c.totalDays + '일 · 연차 ' + c.leaveDays + '일';
+      if (c.useB > 0) meta += ' (올해 ' + c.useA + '일 + 내년 ' + c.useB + '일)';
+      return '<div class="break-card' + (isHero ? ' hero' : '') + '">' +
+        '<span class="break-label">' + label + '</span>' +
+        '<div class="break-name">' + esc(c.name) + ' — ' + fmtMD(c.start) + ' ~ ' + fmtMD(c.end) + '</div>' +
+        '<div class="break-meta">' + meta + '</div>' +
+        '<div class="break-note">' + esc(c.note) + '</div></div>';
+    }
+    function plannerBodyHtml(remain, deadline, next) {
+      var br = buildBestBreaks(res.end, remain, deadline, next);
+      var out = '';
+      if (br.expiringUnused) {
+        var dl = parseDate(deadline);
+        var when = dl ? (dl.getUTCMonth() + 1) + '월 ' + dl.getUTCDate() + '일' : '소진 기한';
+        var hasForced = br.alternatives.some(function (c) { return c.useA >= 1 && c.end <= deadline; });
+        out += '<p class="plan-alert">올해 연차 ' + remain + '일이 ' + when + '에 소멸해요. ' +
+          (hasForced ? '그 전에 쓰는 조합부터 골랐어요.' : '그 전에 쓸 수 있는 조합을 찾지 못했어요.') + '</p>';
+      }
+      if (!br.hero) {
+        out += '<p>지금 잔여 연차로는 3일 이상 연휴를 만들기 어려워요.</p>';
+        return out;
+      }
+      out += breakCardHtml(br.hero, '가장 긴 휴가', true);
+      br.alternatives.forEach(function (c) { out += breakCardHtml(c, '효율 좋은 다른 선택', false); });
+      var leaveSet = {};
+      br.all.forEach(function (c) { c.leaveDates.forEach(function (ds) { leaveSet[ds] = true; }); });
+      function monthGridHtml(grid) {
+        var g = '<table class="month-grid"><thead><tr>';
+        WD.forEach(function (w) { g += '<th>' + w + '</th>'; });
+        g += '</tr></thead><tbody>';
+        grid.weeks.forEach(function (week) {
+          g += '<tr>';
+          week.forEach(function (cell) {
+            if (!cell) { g += '<td class="empty"></td>'; return; }
+            var cls = 'day-cell';
+            if (cell.isWeekend) cls += ' weekend';
+            if (cell.holiday) cls += ' holiday';
+            if (br.all.some(function (c) { return cell.date >= c.start && cell.date <= c.end; })) cls += ' combo';
+            if (leaveSet[cell.date]) cls += ' leave';
+            if (cell.date === res.end) cls += ' today';
+            g += '<td class="' + cls + '"><span class="d-num">' + cell.day + '</span>';
+            if (cell.holiday) g += '<span class="h-name">' + esc(shortHoliday(cell.holiday)) + '</span>';
+            g += '</td>';
+          });
+          g += '</tr>';
+        });
+        return g + '</tbody></table>';
+      }
+      var startD = parseDate(res.end);
+      for (var mi = 0; mi <= 12; mi++) {
+        var md = addMonths(startD, mi);
+        var grid = buildMonthGrid(md.getUTCFullYear(), md.getUTCMonth() + 1);
+        var firstDate = grid.ym + '-01', lastDate = firstDate;
+        grid.weeks.forEach(function (w) { w.forEach(function (cell) { if (cell && cell.date > lastDate) lastDate = cell.date; }); });
+        var hasCombo = br.all.some(function (c) { return c.start <= lastDate && c.end >= firstDate; });
+        var title = grid.year + '년 ' + grid.month + '월';
+        if (hasCombo) out += '<div class="month-card"><h4>' + title + '</h4>' + monthGridHtml(grid) + '</div>';
+        else out += '<details class="month-fold"><summary>' + title + ' — 추천 연휴 없음</summary>' + monthGridHtml(grid) + '</details>';
+      }
+      return out;
+    }
+    var showPlanner = false;
+    var planDefaults = null;
+    if (isRetire) {
+      html += '<h3>남은 연차로 가장 길게 쉬려면</h3>';
+      html += '<p class="note">연차 사용 추천은 \'재직 중 잔여 확인\' 모드에서 볼 수 있어요.</p>';
+    } else if (res.availableNow >= 1) {
+      showPlanner = true;
+      var endYear = Number(res.end.slice(0, 4));
+      planDefaults = {
+        remain: Math.floor(res.availableNow),
+        deadline: endYear + '-12-31',
+        marchEnd: (endYear + 1) + '-03-31'
+      };
+      html += '<h3>남은 연차로 가장 길게 쉬려면</h3>';
+      html += '<div class="plan-inputs">';
+      html += '<label>올해 잔여 연차 (일)<input type="number" id="plan-remain" min="0" step="1" value="' + planDefaults.remain + '"></label>';
+      html += '<label>소진 기한<input type="date" id="plan-deadline" value="' + planDefaults.deadline + '"></label>';
+      html += '<span class="plan-presets"><button type="button" id="plan-preset-yearend">올해 말</button><button type="button" id="plan-preset-march">내년 3월 말</button></span>';
+      html += '<label>내년 연차 (일)<input type="number" id="plan-next" min="0" step="1" value="0"></label>';
+      html += '<button type="button" id="plan-recalc">이 조건으로 다시 추천받기</button>';
+      html += '</div>';
+      html += '<p class="note">내년 연차는 내년 1월 1일부터 쓸 수 있다고 가정해요. 회사 규정이 다르면 소진 기한을 바꿔 보세요.</p>';
+      html += '<div id="plan-body"></div>';
+    }
+
     if (res.warnings.length) {
       html += '<h3>조건과 주의</h3><ul>';
       res.warnings.forEach(function (w) { html += '<li>' + esc(w) + '</li>'; });
       html += '</ul>';
     }
     resultEl.innerHTML = html;
+
+    if (showPlanner) {
+      var planBodyEl = document.getElementById('plan-body');
+      function refreshPlan() {
+        var r = parseInt(document.getElementById('plan-remain').value, 10);
+        var n = parseInt(document.getElementById('plan-next').value, 10);
+        var dl = document.getElementById('plan-deadline').value;
+        planBodyEl.innerHTML = plannerBodyHtml(
+          isNaN(r) || r < 0 ? planDefaults.remain : r,
+          dl || planDefaults.deadline,
+          isNaN(n) || n < 0 ? 0 : n
+        );
+      }
+      refreshPlan();
+      document.getElementById('plan-recalc').addEventListener('click', refreshPlan);
+      document.getElementById('plan-preset-yearend').addEventListener('click', function () {
+        document.getElementById('plan-deadline').value = planDefaults.deadline;
+      });
+      document.getElementById('plan-preset-march').addEventListener('click', function () {
+        document.getElementById('plan-deadline').value = planDefaults.marchEnd;
+      });
+    }
 
     var lines = [];
     lines.push('[연차 계산 결과]');
