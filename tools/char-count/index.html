@@ -29,24 +29,12 @@ gtag('config', 'G-RK33Z9GQX3');
 <header class="site-header"><a href="/">Afterwork Lab</a></header>
 <main>
 <h1>글자수 세기</h1>
-<p>자기소개서, 생활기록부, 원고처럼 글자수 제한이 있는 글을 쓸 때 쓰는 도구입니다. 아래 칸에 글을 붙여 넣으면 공백 포함 글자수, 공백 제외 글자수, 단어수, 바이트수를 입력하는 즉시 셉니다. 입력한 글은 서버로 전송되지 않고 이 브라우저 안에서만 처리됩니다.</p>
+<p>아래 칸에 글을 붙여 넣으면 글자수를 입력하는 즉시 셉니다. 입력한 글은 서버로 전송되지 않고 이 브라우저 안에서만 처리됩니다.</p>
 
 <section class="calculator">
 <h2>글자수 세기</h2>
 <label for="text-input">글 입력</label>
 <textarea id="text-input" rows="10" placeholder="여기에 글을 붙여 넣거나 입력하세요. 입력하면 아래 숫자가 바로 바뀝니다."></textarea>
-<div class="stat-grid">
-<div class="stat primary"><span class="num" id="count-with">0</span><span class="lbl">글자수 (공백 포함)</span></div>
-<div class="stat"><span class="num" id="count-without">0</span><span class="lbl">글자수 (공백 제외)</span></div>
-<div class="stat"><span class="num" id="count-words">0</span><span class="lbl">단어수</span></div>
-<div class="stat"><span class="num" id="count-bytes">0</span><span class="lbl">바이트수 (UTF-8)</span></div>
-</div>
-<p id="limit-note" class="error" role="alert"></p>
-<div class="tool-actions">
-<button type="button" id="copy-btn">글 전체 복사</button>
-<button type="button" id="clear-btn">지우기</button>
-<span class="feedback" id="copy-feedback"></span>
-</div>
 <div class="target-box">
 <label>목표 글자수 <input type="text" inputmode="numeric" id="target-input" placeholder="예: 1000"></label>
 <label>기준
@@ -58,13 +46,27 @@ gtag('config', 'G-RK33Z9GQX3');
 <p class="target-status" id="target-status">목표를 넣으면 남은 글자수를 알려 드립니다.</p>
 <div class="progress"><div class="progress-bar" id="target-bar"></div></div>
 </div>
+<div class="stat-grid">
+<div class="stat primary"><span class="num" id="count-with">0</span><span class="lbl">글자수 (공백 포함)</span></div>
+<div class="stat"><span class="num" id="count-without">0</span><span class="lbl">글자수 (공백 제외)</span></div>
+<div class="stat"><span class="num" id="count-words">0</span><span class="lbl">단어수</span></div>
+<div class="stat"><span class="num" id="count-bytes">0</span><span class="lbl">바이트수 (UTF-8)</span></div>
+</div>
+<p id="limit-note" class="error" role="alert"></p>
+<div class="tool-actions">
+<button type="button" id="copy-btn">글 전체 복사</button>
+<button type="button" id="strip-spaces-btn">공백 모두 제거</button>
+<button type="button" id="strip-lines-btn">줄바꿈 제거</button>
+<button type="button" id="clear-btn">지우기</button>
+<span class="feedback" id="copy-feedback"></span>
+</div>
 </section>
 
 <section>
 <h2>세는 기준</h2>
 <ul>
 <li>줄바꿈 종류(엔터 방식)가 달라도 하나로 통일한 뒤 셉니다.</li>
-<li>글자수는 문자를 하나씩 세는 방식이라 이모지도 1자로 셉니다.</li>
+<li>글자수는 문자를 하나씩 세는 방식입니다. 이모지는 종류에 따라 한 개가 여러 자로 셀 수 있습니다.</li>
 <li>공백 포함은 띄어쓰기·탭·줄바꿈까지 전부 센 값이고, 공백 제외는 그것들을 빼고 센 값입니다.</li>
 <li>단어수는 공백으로 나뉜 덩어리의 개수입니다.</li>
 <li>바이트수는 UTF-8 기준입니다. 한글 1자는 3바이트, 영문과 숫자는 1바이트, 줄바꿈은 1바이트입니다.</li>
