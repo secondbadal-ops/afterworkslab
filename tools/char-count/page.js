@@ -71,6 +71,18 @@
     update();
     input.focus();
   });
+  document.getElementById('strip-spaces-btn').addEventListener('click', function () {
+    input.value = input.value.replace(/\s/g, '');
+    elFeedback.textContent = '공백을 모두 제거했습니다.';
+    update();
+    input.focus();
+  });
+  document.getElementById('strip-lines-btn').addEventListener('click', function () {
+    input.value = input.value.replace(/\r\n|\r|\n/g, '');
+    elFeedback.textContent = '줄바꿈을 제거했습니다.';
+    update();
+    input.focus();
+  });
   document.getElementById('copy-btn').addEventListener('click', function () {
     function done() {
       elFeedback.textContent = '복사했습니다.';
