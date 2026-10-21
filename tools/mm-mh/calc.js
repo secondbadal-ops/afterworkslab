@@ -14,6 +14,19 @@ function rowEffort(row, stdMonthlyHours) {
   return { mh: mh, mm: mm, md: md };
 }
 
+// 빠른 단위 변환. unit: 'mm' | 'mh' | 'md'. MD는 기준 하루 근무시간으로 환산한다.
+function convertUnits(value, unit, stdMonthlyHours, stdHoursPerDay) {
+  var mh;
+  if (unit === 'mm') mh = value * stdMonthlyHours;
+  else if (unit === 'md') mh = value * stdHoursPerDay;
+  else mh = value;
+  return {
+    mh: mh,
+    mm: stdMonthlyHours > 0 ? mh / stdMonthlyHours : NaN,
+    md: stdHoursPerDay > 0 ? mh / stdHoursPerDay : NaN
+  };
+}
+
 function totalEffort(rows, stdMonthlyHours) {
   var total = { mh: 0, mm: 0, md: 0, rows: [] };
   for (var i = 0; i < rows.length; i++) {
@@ -79,6 +92,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     LIMITS: LIMITS,
     monthlyStandardHours: monthlyStandardHours,
+    convertUnits: convertUnits,
     rowEffort: rowEffort,
     totalEffort: totalEffort,
     parseField: parseField,
