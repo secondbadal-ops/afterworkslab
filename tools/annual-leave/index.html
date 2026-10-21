@@ -64,16 +64,17 @@ gtag('config', 'G-RK33Z9GQX3');
 <header class="site-header"><a href="/">Afterwork Lab</a></header>
 <main>
 <h1>연차 계산기 — 퇴사할 때 남은 연차와 예상 수당</h1>
-<p>퇴사를 앞두고 있으면 남은 연차가 며칠이고, 못 쓴 연차수당을 얼마나 받을 수 있는지가 궁금해집니다. 이 계산기는 입사일 기준으로 발생한 연차를 날짜 단위로 쌓아 올리고, 사용한 일수를 빼서 정산 대상 일수와 예상 수당을 함께 보여 줍니다.</p>
-<p>연차는 "1년의 근로를 마친 다음 날"에 발생한다는 대법원 판례와 고용노동부 행정해석을 그대로 반영합니다. 그래서 딱 1년(365일) 근무한 경우와 하루 더 근무한 경우의 정산 일수가 15일 차이로 갈리는 경계까지 계산에 들어갑니다.</p>
+<p>입사일만 넣으면 발생한 연차에서 사용한 일수를 빼서, 정산 대상 일수와 예상 수당을 함께 보여 드립니다. 재직 중이라면 지금 쓸 수 있는 연차와 추천 연휴까지 달력으로 보여 드립니다.</p>
 
 <section class="calculator">
 <h2>계산하기</h2>
 <form id="calc-form">
-<fieldset>
+<fieldset class="mode-fieldset">
 <legend>무엇을 계산하나요</legend>
-<label><input type="radio" name="mode" value="retire" checked> 퇴직 정산 (마지막 근무일까지)</label>
-<label><input type="radio" name="mode" value="current"> 재직 중 잔여 확인 (오늘 기준)</label>
+<div class="mode-cards">
+<label class="mode-card"><input type="radio" name="mode" value="retire" checked><span class="mode-card-title">퇴직 정산</span><span class="mode-card-desc">마지막 근무일까지 · 남은 연차와 예상 수당</span></label>
+<label class="mode-card"><input type="radio" name="mode" value="current"><span class="mode-card-title">재직 중 잔여 확인</span><span class="mode-card-desc">오늘 기준 · 지금 쓸 수 있는 연차와 추천 연휴</span></label>
+</div>
 </fieldset>
 <fieldset>
 <legend>기본 입력</legend>
@@ -84,6 +85,8 @@ gtag('config', 'G-RK33Z9GQX3');
 <label>월 통상임금(원, 선택) <input type="text" inputmode="numeric" id="monthly-wage" placeholder="예: 3000000"></label>
 <p class="note">통상임금은 기본급과 정기적·일률적으로 받는 고정수당, 정기상여금의 월 환산분을 합한 금액입니다. 재직 조건이 붙은 정기상여금도 포함될 수 있습니다. 비워 두면 일수만 계산합니다.</p>
 </fieldset>
+<details class="settings-fold">
+<summary>확인 사항 — 사업장 규모·사용촉진 등 (일반적인 경우면 펼치지 않아도 됩니다)</summary>
 <fieldset>
 <legend>확인 사항</legend>
 <label>상시근로자 5인 이상 사업장인가요
@@ -105,6 +108,9 @@ gtag('config', 'G-RK33Z9GQX3');
 </select></label>
 <label>이미 지급받은 미사용 연차수당(원) <input type="text" inputmode="numeric" id="prepaid" value="0"></label>
 </fieldset>
+</details>
+<details class="settings-fold">
+<summary>고급 입력 — 근무시간·출근율 예외 (해당할 때만)</summary>
 <fieldset>
 <legend>고급 입력 (해당할 때만)</legend>
 <label>주 소정근로시간(시간) <input type="text" inputmode="decimal" id="weekly-hours" value="40"></label>
@@ -124,6 +130,7 @@ gtag('config', 'G-RK33Z9GQX3');
 <button type="button" id="add-low-row">출근율 80% 미만 연도 추가</button>
 <p class="note">출근율이 80% 미만인 해는 15일 대신, 그해 개근한 개월 수만큼(월 1일) 발생한 것으로 계산합니다(근로기준법 제60조 제2항).</p>
 </fieldset>
+</details>
 <button type="submit" class="primary">연차 계산</button>
 <p id="error" class="error" role="alert"></p>
 </form>
