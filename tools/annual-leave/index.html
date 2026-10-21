@@ -7,6 +7,38 @@
 <meta name="description" content="입사일과 마지막 근무일, 사용한 연차, 월 통상임금을 넣으면 퇴직 시 정산 대상 연차 일수와 미사용 연차수당 예상액을 계산합니다. 딱 1년 근무하고 퇴사하는 경우처럼 하루 차이로 갈리는 경계도 판례·행정해석 기준으로 반영합니다.">
 <link rel="canonical" href="https://afterworkslab.com/tools/annual-leave/">
 <link rel="stylesheet" href="/style.css">
+<style>
+.plan-inputs { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: flex-end; margin: 10px 0 4px; }
+.plan-inputs label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.plan-inputs input { padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+.plan-presets { display: flex; gap: 6px; }
+.plan-alert { background: #fff7e6; border: 1px solid #f0b429; border-radius: 8px; padding: 9px 12px; font-size: 13.5px; margin: 10px 0; }
+.break-card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; margin: 8px 0; background: #fff; }
+.break-card.hero { border-color: #2563eb; background: #f4f8ff; }
+.break-label { display: inline-block; font-size: 12px; font-weight: 700; color: #2563eb; border: 1px solid #2563eb; border-radius: 999px; padding: 1px 8px; margin-bottom: 6px; }
+.break-name { font-weight: 700; font-size: 15px; }
+.break-meta { font-size: 13.5px; color: #333; margin-top: 2px; }
+.break-note { font-size: 12.5px; color: #666; margin-top: 2px; }
+.month-card { margin: 14px 0; }
+.month-card h4 { margin: 0 0 6px; font-size: 15px; }
+.month-fold { margin: 8px 0; border: 1px solid #eee; border-radius: 8px; padding: 6px 10px; }
+.month-fold summary { cursor: pointer; font-size: 13.5px; color: #555; }
+.month-grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.month-grid th { font-size: 11.5px; color: #888; font-weight: 400; padding: 3px 0; text-align: center; }
+.month-grid td { border: 1px solid #eee; height: 44px; vertical-align: top; padding: 3px 4px; font-size: 12.5px; }
+.month-grid td.empty { background: #fcfcfc; border-color: #f3f3f3; }
+.day-cell .d-num { font-weight: 600; }
+.day-cell.weekend { background: #fafafa; }
+.day-cell.weekend .d-num { color: #999; }
+.day-cell.holiday .d-num { color: #d92d20; }
+.day-cell .h-name { display: block; font-size: 9.5px; color: #d92d20; line-height: 1.25; }
+.day-cell.combo { background: #eaf1fe; }
+.day-cell.leave { background: #2563eb; color: #fff; }
+.day-cell.leave .d-num { color: #fff; }
+.day-cell.leave .h-name { color: #dbe7ff; }
+.day-cell.today { box-shadow: inset 0 0 0 2px #2563eb; }
+@media (max-width: 560px) { .month-grid td { height: 38px; font-size: 11.5px; padding: 2px; } .day-cell .h-name { font-size: 8.5px; } }
+</style>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Afterwork Lab">
 <meta property="og:title" content="연차 계산기 — 퇴사할 때 남은 연차와 예상 수당 계산 | Afterwork Lab">
@@ -120,6 +152,7 @@ gtag('config', 'G-RK33Z9GQX3');
 <li><strong>1년 이상</strong>: 근로연도를 마친 다음 날 15일이 발생합니다. 3년 이상부터는 2년마다 1일씩 가산돼 최대 25일까지 늘어납니다(제60조 제1항·제4항).</li>
 <li><strong>발생 인정 조건</strong>: 발생한 날에 근로관계가 있어야 합니다. 딱 365일만 근무하면 15일은 발생하지 않고, 366일째까지 일하면 발생합니다(대법원 2021다227100, 고용노동부 2021.12.16 행정해석 변경).</li>
 <li><strong>정산 대상</strong> = 마지막 근무일까지 발생한 연차 − 사용한 연차. 예상 수당 = 정산 대상 일수 × 1일 통상임금 − 이미 받은 수당.</li>
+<li><strong>연차 사용 추천</strong>: 재직 중 잔여 확인 모드에서는 남은 연차로 만들 수 있는 가장 긴 연휴와 효율 좋은 대안을 실제 달력 위에 표시합니다. 소진 기한과 내년 연차를 바꾸면 그 조건에 맞춰 다시 추천합니다.</li>
 <li><strong>1일 통상임금</strong> = 월 통상임금 ÷ 월 기준시간 수 × 1일 소정근로시간. 주 40시간 기준 월 기준시간 수는 209시간입니다.</li>
 <li>중간 계산은 반올림하지 않고, 최종 금액만 원 단위로 반올림합니다. 표시용 1일 통상임금도 반올림해 보여 주므로 표시값 × 일수와 예상액이 조금 다를 수 있습니다.</li>
 </ul>
