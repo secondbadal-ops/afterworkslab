@@ -154,5 +154,54 @@
     feedbackEl.textContent = '';
   });
 
+  // 빠른 변환 — 단위 하나를 고치면 나머지를 현재 월 기준으로 환산한다
+  var quickMm = document.getElementById('quick-mm');
+  var quickMh = document.getElementById('quick-mh');
+  var quickMd = document.getElementById('quick-md');
+  var quickBase = document.getElementById('quick-base');
+  var quickSource = null;
+
+  function trimNum(v, digits) {
+    var s = v.toFixed(digits);
+    if (s.indexOf('.') >= 0) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    return s;
+  }
+
+  function refreshQuick(fromEl) {
+    var h = Number(document.getElementById('std-hours').value);
+    var d = Number(document.getElementById('workdays').value);
+    if (!isFinite(h) || !isFinite(d) || h <= 0 || d <= 0) return;
+    var stdMonthly = h * d;
+    quickBase.textContent = '기준: 1MM = ' + formatMH(stdMonthly) + 'MH, 1MD = ' + h + 'MH (하루 ' + h + '시간 × 월 ' + d + '일). 기준은 아래 월 기준에서 바꿀 수 있습니다.';
+    var src = fromEl || (quickSource === 'mm' ? quickMm : quickSource === 'md' ? quickMd : quickMh);
+    var raw = String(src.value).trim();
+    var v = Number(raw);
+    if (raw === '' || !isFinite(v) || v < 0) {
+      if (src !== quickMm) quickMm.value = '';
+      if (src !== quickMh) quickMh.value = '';
+      if (src !== quickMd) quickMd.value = '';
+      return;
+    }
+    var unit = src === quickMm ? 'mm' : src === quickMd ? 'md' : 'mh';
+    var r = convertUnits(v, unit, stdMonthly, h);
+    if (src !== quickMm) quickMm.value = trimNum(r.mm, 2);
+    if (src !== quickMh) quickMh.value = trimNum(r.mh, 1);
+    if (src !== quickMd) quickMd.value = trimNum(r.md, 1);
+  }
+
+  [[quickMm, 'mm'], [quickMh, 'mh'], [quickMd, 'md']].forEach(function (pair) {
+    pair[0].addEventListener('input', function () {
+      quickSource = pair[1];
+      refreshQuick(pair[0]);
+      if (!window.__quickFired && typeof gtag === 'function') {
+        window.__quickFired = true;
+        gtag('event', 'tool_use', { tool: 'mm-mh-quick' });
+      }
+    });
+  });
+  document.getElementById('std-hours').addEventListener('input', function () { refreshQuick(null); });
+  document.getElementById('workdays').addEventListener('input', function () { refreshQuick(null); });
+  refreshQuick(null);
+
   addRow({ count: '1', days: '20', hours: '8', rate: '100' });
 })();
