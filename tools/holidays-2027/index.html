@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2027년 공휴일 24일·대체공휴일 7일 — 잔여 연차로 만드는 연휴 플래너 | Afterwork Lab</title>
+<meta name="description" content="2027년 공휴일은 일요일을 빼고 24일(대체공휴일 7일 포함), 관공서 공휴일은 72일, 주5일 실질 휴일은 119일입니다. 13개 공휴일 목록과 대체공휴일 판정 규칙을 정리하고, 내 잔여 연차를 넣으면 가능한 연휴 조합만 골라 보여 드립니다.">
+<link rel="canonical" href="https://afterworkslab.com/tools/holidays-2027/">
+<link rel="stylesheet" href="/style.css">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Afterwork Lab">
+<meta property="og:title" content="2027년 공휴일·대체공휴일 — 잔여 연차 플래너 | Afterwork Lab">
+<meta property="og:description" content="2027년 공휴일 24일, 대체공휴일 7일, 실질 휴일 119일. 목록·판정 규칙·내 잔여 연차로 가능한 연휴 조합을 한 페이지에서 확인하세요.">
+<meta property="og:url" content="https://afterworkslab.com/tools/holidays-2027/">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"2027 공휴일·잔여 연차 플래너","url":"https://afterworkslab.com/tools/holidays-2027/","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"2027년 공휴일은 며칠인가요?","acceptedAnswer":{"@type":"Answer","text":"일요일을 빼고 24일입니다. 지정 공휴일 17일에 대체공휴일 7일을 더한 숫자입니다. 일요일 52일까지 합친 관공서 공휴일은 72일이고, 주5일 근무자가 실제로 쉬는 날은 119일입니다. 우주항공청 2027년 월력요항(2026년 6월 29일 발표) 기준입니다."}},{"@type":"Question","name":"2027년 대체공휴일은 며칠이고 언제인가요?","acceptedAnswer":{"@type":"Answer","text":"총 7일입니다. 설 2월 9일, 노동절 5월 3일, 제헌절 7월 19일, 광복절 8월 16일, 개천절 10월 4일, 한글날 10월 11일, 성탄절 12월 27일입니다."}},{"@type":"Question","name":"2027년에 연차를 가장 효율적으로 쓰는 구간은 어디인가요?","acceptedAnswer":{"@type":"Answer","text":"추석입니다. 9월 13일(월)과 17일(금)에 연차 2일을 쓰면 9월 11일부터 19일까지 9일을 쉽니다. 연차 1일만 쓸 수 있으면 설 앞 2월 5일(금)이나 어린이날 앞 5월 4일(화)에 붙여 5일을 쉬는 조합이, 원문 대조로 검증된 대표값 기준 가장 깁니다."}},{"@type":"Question","name":"현충일에는 왜 대체공휴일이 없나요?","acceptedAnswer":{"@type":"Answer","text":"신정과 현충일은 대체공휴일 적용 대상이 아니기 때문입니다. 2027년 현충일(6월 6일)은 일요일이라 평일 휴일이 생기지 않습니다."}},{"@type":"Question","name":"노동절과 제헌절도 2027년 공휴일인가요?","acceptedAnswer":{"@type":"Answer","text":"네. 노동절은 2026년 5월 1일부터, 제헌절은 2026년 5월 11일부터 공휴일입니다. 2027년에는 둘 다 토요일이라 각각 5월 3일과 7월 19일이 대체공휴일입니다."}}]}
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RK33Z9GQX3"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-RK33Z9GQX3');
+</script>
+<style>
+.plan-item{border:1px solid #e0e0e0;border-radius:8px;padding:10px 12px;margin-bottom:8px;background:#fff;list-style:none}
+#plan-list{padding:0;margin:10px 0}
+.copy-plan{margin-left:6px}
+.holiday-table td,.holiday-table th{vertical-align:top}
+@media (max-width:560px){.holiday-table{font-size:12.5px}.holiday-table th,.holiday-table td{padding:5px 5px}}
+</style>
+</head>
+<body>
+<header class="site-header"><a href="/">Afterwork Lab</a></header>
+<main>
+<h1>2027년 공휴일 — 잔여 연차로 만드는 연휴 플래너</h1>
+<p>2027년 공휴일은 일요일을 빼고 <strong>24일</strong>(대체공휴일 7일 포함), 일요일까지 합친 관공서 공휴일은 <strong>72일</strong>, 주5일 근무자가 실제로 쉬는 날은 <strong>119일</strong>입니다. 우주항공청 2027년 월력요항(2026년 6월 29일 발표) 기준입니다. 3일 이상 연휴는 10차례 있지만 5일을 넘는 연휴는 없어서, 긴 휴가는 연차를 붙여야 만들 수 있는 해입니다.</p>
+<p>아래 목록은 그 기준을 그대로 옮긴 것이고, 플래너에 내 잔여 연차를 넣으면 그 범위 안에서 가능한 연휴 조합만 골라 보여 드립니다. 남은 연차가 며칠인지부터 확인하려면 <a href="/tools/annual-leave/">연차 계산기 (퇴직 정산)</a>에서 발생한 연차와 사용한 연차를 계산해 보세요.</p>
+
+<div class="stat-grid">
+<div class="stat primary"><span class="num">24일</span><span class="lbl">공휴일 (일요일 제외)</span></div>
+<div class="stat"><span class="num">7일</span><span class="lbl">대체공휴일</span></div>
+<div class="stat"><span class="num">119일</span><span class="lbl">주5일 실질 휴일</span></div>
+<div class="stat"><span class="num">10차례</span><span class="lbl">3일 이상 연휴</span></div>
+</div>
+
+<section class="calculator">
+<h2>내 잔여 연차로 가능한 연휴 찾기</h2>
+<form id="planner-form">
+<fieldset>
+<legend>잔여 연차</legend>
+<label>남은 연차(일) <input type="text" inputmode="decimal" id="remaining-input" placeholder="예: 3"></label>
+<p class="note">입력하는 즉시 아래 조합이 바뀝니다. 입력값은 브라우저 안에서만 처리되고 저장·전송되지 않습니다. 주5일 근무, 관공서 공휴일을 유급휴일로 적용받는 사업장을 기준으로 합니다.</p>
+</fieldset>
+</form>
+<p id="plan-status" class="target-status"></p>
+<ul id="plan-list"></ul>
+<div class="tool-actions">
+<button type="button" id="copy-all-btn">보이는 조합 전체 복사</button>
+<button type="button" id="reset-btn">입력 초기화</button>
+<span class="feedback" id="copy-feedback"></span>
+</div>
+<p class="note">정렬 기준은 연차 1일당 쉬는 날이 많은 순서입니다. 같은 연차를 써도 붙이는 날에 따라 총 휴일이 달라지니, 효율만 보지 말고 원하는 시기도 함께 보세요.</p>
+</section>
+
+<section>
+<h2>2027년 공휴일 목록</h2>
+<table class="holiday-table">
+<thead><tr><th>공휴일</th><th>날짜(요일)</th><th>대체공휴일</th><th>쉬는 기간</th></tr></thead>
+<tbody>
+<tr><td>신정</td><td>1/1(금)</td><td>없음 (대상 아님)</td><td>1/1~1/3, 3일</td></tr>
+<tr><td>설 연휴</td><td>2/6(토)~2/8(월), 설날 2/7(일)</td><td>2/9(화)</td><td>2/6~2/9, 4일</td></tr>
+<tr><td>삼일절</td><td>3/1(월)</td><td>해당 없음</td><td>2/27~3/1, 3일</td></tr>
+<tr><td>노동절</td><td>5/1(토)</td><td>5/3(월)</td><td>5/1~5/3, 3일</td></tr>
+<tr><td>어린이날</td><td>5/5(수)</td><td>해당 없음</td><td>당일</td></tr>
+<tr><td>부처님오신날</td><td>5/13(목)</td><td>해당 없음</td><td>당일</td></tr>
+<tr><td>현충일</td><td>6/6(일)</td><td>없음 (대상 아님)</td><td>평일 휴일 0</td></tr>
+<tr><td>제헌절</td><td>7/17(토)</td><td>7/19(월)</td><td>7/17~7/19, 3일</td></tr>
+<tr><td>광복절</td><td>8/15(일)</td><td>8/16(월)</td><td>8/14~8/16, 3일</td></tr>
+<tr><td>추석 연휴</td><td>9/14(화)~9/16(목), 추석 당일 9/15(수)</td><td>해당 없음</td><td>3일 (주말과 안 붙음)</td></tr>
+<tr><td>개천절</td><td>10/3(일)</td><td>10/4(월)</td><td>10/2~10/4, 3일</td></tr>
+<tr><td>한글날</td><td>10/9(토)</td><td>10/11(월)</td><td>10/9~10/11, 3일</td></tr>
+<tr><td>성탄절</td><td>12/25(토)</td><td>12/27(월)</td><td>12/25~12/27, 3일</td></tr>
+</tbody>
+</table>
+<p class="note">노동절(2026년 5월 1일부터)과 제헌절(2026년 5월 11일부터)은 새로 공휴일이 된 날입니다. 2027년에는 둘 다 토요일이라 대체공휴일이 붙는 첫해입니다.</p>
+</section>
+
+<section>
+<h2>숫자가 갈리는 이유 — 셈법 정의</h2>
+<ul>
+<li><strong>공휴일 24일</strong> — 일요일을 뺀 숫자입니다. 지정 공휴일 17일 + 대체공휴일 7일입니다.</li>
+<li><strong>관공서 공휴일 72일</strong> — 일요일 52일을 포함한 월력요항 공식 수치입니다. 52 + 24 − 일요일 겹침 4일(설날·현충일·광복절·개천절)입니다.</li>
+<li><strong>실질 휴일 119일</strong> — 주5일 근무 기준입니다. 72 + 토요일 52일 − 토요일 겹침 5일(설 연휴 첫날·노동절·제헌절·한글날·성탄절)입니다.</li>
+<li>출처에 따라 20일처럼 다른 숫자가 보이는 것은 대체공휴일을 일부만 세거나 명절을 묶어 세는 별도 셈법 때문으로 보입니다. 이 페이지는 월력요항 셈법(24일·72일·119일)으로 통일합니다.</li>
+</ul>
+</section>
+
+<section>
+<h2>대체공휴일 판정 규칙</h2>
+<ul>
+<li><strong>설날·추석 연휴</strong> — 일요일 또는 다른 공휴일과 겹칠 때만 대체공휴일이 생깁니다. 토요일 겹침은 보상되지 않아, 2027년 설은 대체공휴일이 2월 9일 하루뿐입니다.</li>
+<li><strong>국경일(삼일절·광복절·개천절·한글날)·어린이날·부처님오신날·성탄절·노동절·제헌절</strong> — 토요일 또는 일요일과 겹치면 그다음 첫 평일이 대체공휴일입니다.</li>
+<li><strong>신정·현충일</strong> — 대체공휴일 대상이 아닙니다. 그래서 일요일인 2027년 현충일은 평일 휴일이 생기지 않습니다.</li>
+<li>근거: 「공휴일에 관한 법률」 제2조·제3조, 「관공서의 공휴일에 관한 규정」 제3조 (대통령령 제36290호, 시행 2026년 5월 11일).</li>
+</ul>
+</section>
+
+<section>
+<h2>연차 조합 대표값</h2>
+<table>
+<thead><tr><th>연차 사용</th><th>쉬는 구간</th><th>총 휴일</th></tr></thead>
+<tbody>
+<tr><td>설 2/5(금) 1일</td><td>2/5~2/9</td><td>5일</td></tr>
+<tr><td>5/4(화) 1일</td><td>5/1~5/5</td><td>5일</td></tr>
+<tr><td>부처님오신날 다음 날 5/14(금) 1일</td><td>5/13~5/16</td><td>4일</td></tr>
+<tr><td>추석 9/13(월)+9/17(금) 2일</td><td>9/11~9/19</td><td>9일</td></tr>
+<tr><td>10/5(화)~10/8(금) 4일</td><td>10/2~10/11</td><td>10일</td></tr>
+<tr><td>성탄 앞 12/24(금) 1일</td><td>12/24~12/27</td><td>4일</td></tr>
+</tbody>
+</table>
+<p>플래너는 위 대표값 6개 안에서만 골라 보여 드립니다. 달력 계산으로 만들 수 있는 조합이 더 있어도, 원문 대조로 검증된 조합만 싣는 것이 이 페이지의 원칙입니다.</p>
+</section>
+
+<section class="faq">
+<h2>자주 묻는 질문</h2>
+<h3>2027년 공휴일은 며칠인가요?</h3>
+<p>일요일을 빼고 24일입니다. 지정 공휴일 17일에 대체공휴일 7일을 더한 숫자입니다. 일요일 52일까지 합친 관공서 공휴일은 72일이고, 주5일 근무자가 실제로 쉬는 날은 119일입니다.</p>
+<h3>2027년 대체공휴일은 며칠이고 언제인가요?</h3>
+<p>총 7일입니다. 설 2월 9일, 노동절 5월 3일, 제헌절 7월 19일, 광복절 8월 16일, 개천절 10월 4일, 한글날 10월 11일, 성탄절 12월 27일입니다.</p>
+<h3>2027년에 연차를 가장 효율적으로 쓰는 구간은 어디인가요?</h3>
+<p>추석입니다. 9월 13일(월)과 17일(금)에 연차 2일을 쓰면 9월 11일부터 19일까지 9일을 쉽니다. 연차 1일만 쓸 수 있으면 설 앞 2월 5일(금)이나 어린이날 앞 5월 4일(화)에 붙여 5일을 쉬는 조합이, 원문 대조로 검증된 대표값 기준 가장 깁니다.</p>
+<h3>현충일에는 왜 대체공휴일이 없나요?</h3>
+<p>신정과 현충일은 대체공휴일 적용 대상이 아니기 때문입니다. 2027년 현충일(6월 6일)은 일요일이라 평일 휴일이 생기지 않습니다.</p>
+<h3>노동절과 제헌절도 2027년 공휴일인가요?</h3>
+<p>네. 노동절은 2026년 5월 1일부터, 제헌절은 2026년 5월 11일부터 공휴일입니다. 2027년에는 둘 다 토요일이라 각각 5월 3일과 7월 19일이 대체공휴일입니다.</p>
+</section>
+
+<section>
+<h2>함께 쓰기</h2>
+<ul class="tool-list">
+<li><a href="/tools/annual-leave/">연차 계산기 (퇴직 정산)</a><br>입사일과 사용한 연차로 내 잔여 연차가 며칠인지, 퇴직 시 정산 대상과 예상 수당은 얼마인지 계산합니다. 여기서 나온 잔여 일수를 위 플래너에 넣으면 됩니다.</li>
+<li><a href="/tools/char-count/">글자수 세기</a><br>휴가 신청 사유나 자기소개서 글자수를 실시간으로 셉니다.</li>
+</ul>
+</section>
+
+<section class="disclaimer">
+<h2>참고 사항</h2>
+<p>이 페이지는 우주항공청 2027년 월력요항(2026년 6월 29일 발표)과 현행 법령을 기준으로 정리한 참고 정보입니다. 임시공휴일이 새로 지정되거나 법령이 바뀌면 날짜가 달라질 수 있습니다. 관공서 공휴일이 유급휴일로 적용되는 범위는 사업장 규모와 취업규칙에 따라 다르니, 실제 연차 신청 전에는 회사 사내 달력을 한 번 더 확인해 주세요. 음력 날짜(설날·부처님오신날·추석)는 월력요항 기반 복수 출처가 일치함을 확인했으나, 천문연구원 월력요항 원표와의 직접 대조는 원표 페이지 복구 후 재확인할 항목으로 남겨 둡니다.</p>
+</section>
+</main>
+<footer class="site-footer"><a href="/">Afterwork Lab</a> · <a href="/tools/annual-leave/">연차 계산기</a> · <a href="/tools/mm-mh/">MM·MH 공수 변환 계산기</a> · <a href="/tools/project-estimate/">프로젝트 견적 시뮬레이터</a> · <a href="/tools/char-count/">글자수 세기</a></footer>
+<script src="calc.js"></script>
+<script src="page.js"></script>
+</body>
+</html>
