@@ -171,34 +171,254 @@ function calculate(input) {
   };
 }
 
-// ---------- 발생 달력 (표시 전용 — 계산 의미는 바꾸지 않는다) ----------
-// 입사 월부터 기준일(마지막 근무일) 월까지의 월 셀 배열을 만든다.
-// events는 calculate()의 결과 행(accrualDate 'YYYY-MM-DD' 문자열) 또는 buildEvents 원형(Date) 모두 받는다.
-// 반환 셀: {ym, year, month, accruals: [{date, days, period}], monthDays, cumulative}
-function buildCalendar(hireStr, endStr, events) {
-  var hire = parseDate(hireStr), end = parseDate(endStr);
-  if (!hire || !end || cmpDate(end, hire) < 0) return [];
-  var rows = (events || []).map(function (e) {
-    return {
-      date: typeof e.accrualDate === 'string' ? e.accrualDate : fmtDate(e.accrualDate),
-      days: e.days, period: e.period
-    };
-  });
-  rows.sort(function (a, b) { return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); });
-  function p2(n) { return (n < 10 ? '0' : '') + n; }
-  var cells = [], cumulative = 0;
-  var y = hire.getUTCFullYear(), mo = hire.getUTCMonth() + 1;
-  var endY = end.getUTCFullYear(), endMo = end.getUTCMonth() + 1;
-  while (y < endY || (y === endY && mo <= endMo)) {
-    var ym = y + '-' + p2(mo);
-    var accruals = rows.filter(function (r) { return r.date.slice(0, 7) === ym; });
-    var monthDays = 0;
-    accruals.forEach(function (a) { monthDays += a.days; });
-    cumulative += monthDays;
-    cells.push({ ym: ym, year: y, month: mo, accruals: accruals, monthDays: monthDays, cumulative: cumulative });
-    mo++; if (mo > 12) { mo = 1; y++; }
+// ---------- 연차 사용 플래너 (표시 전용 — 발생·정산 계산 의미는 바꾸지 않는다) ----------
+// 컨셉 (2026-10-21 확정): "남은 연차로 가장 길게·효율적으로 쉬는 법"
+// 공휴일 데이터는 tools/holidays-2027/calc.js의 HOLIDAYS(2027년 확정분)를 이식하고,
+// 탐색 범위의 앞부분(2026년)에 필요한 2026-12-25 성탄절 1건을 더했다.
+var PLANNER_HOLIDAYS = [
+  { name: '성탄절', dates: ['2026-12-25'], substitute: null },
+  { name: '신정', dates: ['2027-01-01'], substitute: null },
+  { name: '설 연휴', dates: ['2027-02-06', '2027-02-07', '2027-02-08'], substitute: '2027-02-09' },
+  { name: '삼일절', dates: ['2027-03-01'], substitute: null },
+  { name: '노동절', dates: ['2027-05-01'], substitute: '2027-05-03' },
+  { name: '어린이날', dates: ['2027-05-05'], substitute: null },
+  { name: '부처님오신날', dates: ['2027-05-13'], substitute: null },
+  { name: '현충일', dates: ['2027-06-06'], substitute: null },
+  { name: '제헌절', dates: ['2027-07-17'], substitute: '2027-07-19' },
+  { name: '광복절', dates: ['2027-08-15'], substitute: '2027-08-16' },
+  { name: '추석 연휴', dates: ['2027-09-14', '2027-09-15', '2027-09-16'], substitute: null },
+  { name: '개천절', dates: ['2027-10-03'], substitute: '2027-10-04' },
+  { name: '한글날', dates: ['2027-10-09'], substitute: '2027-10-11' },
+  { name: '성탄절', dates: ['2027-12-25'], substitute: '2027-12-27' }
+];
+var HOLIDAY_NAME_MAP = {}; // 날짜 -> 표시명 (대체공휴일은 '대체공휴일(원 공휴일명)')
+var HOLIDAY_BASE_MAP = {}; // 날짜 -> 원 공휴일명
+PLANNER_HOLIDAYS.forEach(function (h) {
+  h.dates.forEach(function (d) { HOLIDAY_NAME_MAP[d] = h.name; HOLIDAY_BASE_MAP[d] = h.name; });
+  if (h.substitute) {
+    HOLIDAY_NAME_MAP[h.substitute] = '대체공휴일(' + h.name + ')';
+    HOLIDAY_BASE_MAP[h.substitute] = h.name;
   }
-  return cells;
+});
+function holidayName(dateStr) { return HOLIDAY_NAME_MAP[dateStr] || null; }
+function isHoliday(dateStr) { return !!HOLIDAY_BASE_MAP[dateStr]; }
+
+// 연휴 특징 한 줄 (시즌 일반론 수준 — 단정적 여행 추천은 쓰지 않는다)
+var FEATURE_NOTES = {
+  '신정': '겨울 · 새해 첫날, 한 해를 시작하는 시기',
+  '설 연휴': '겨울 한가운데 · 귀성·가족 일정이 몰리는 시기',
+  '삼일절': '초봄 · 봄이 시작되는 시기',
+  '노동절': '봄 · 나들이하기 좋은 시기',
+  '어린이날': '봄 · 가족과 보내기 좋은 시기',
+  '부처님오신날': '늦봄 · 초여름이 가까워지는 시기',
+  '현충일': '초여름 · 덥기 전 나들이하기 좋은 시기',
+  '제헌절': '한여름 · 장마와 겹치기 쉬운 시기',
+  '광복절': '한여름 · 무더위가 한창인 시기',
+  '추석 연휴': '초가을 · 단풍이 시작되는 무렵',
+  '개천절': '가을 · 단풍이 물들기 시작하는 시기',
+  '한글날': '가을 · 단풍이 한창인 시기',
+  '성탄절': '연말 · 한 해를 마무리하는 시기',
+  '주말 연결': '공휴일은 없지만 주말과 이어서 쉬는 구간'
+};
+
+function diffDays(a, b) { return Math.round((b.getTime() - a.getTime()) / 86400000); }
+
+// 남은 연차로 만들 수 있는 연휴 조합을 찾는다.
+// budgetA: 소진 기한(deadlineStr)까지 쓸 수 있는 올해 연차, budgetB: 내년 연차 (내년 1월 1일부터 사용 가능 가정)
+// 후보는 (1) 휴무 덩어리 앞뒤 평일 붙이기 (한쪽 최대 3일) (2) 연속한 휴무 덩어리 사이의 평일을 전부 채우는 잇기, 두 경로로 만든다.
+// 반환: {hero, alternatives, all, expiringUnused}
+//   hero: 총 일수가 가장 긴 조합 1개. alternatives: 겹치지 않는 효율 순 대안 최대 3개 (서로 다른 달 우선).
+//   조합: {start, end, totalDays, leaveDays, leaveDates, name, note, useA, useB}
+function buildBestBreaks(fromStr, budgetA, deadlineStr, budgetB) {
+  var empty = { hero: null, alternatives: [], all: [], expiringUnused: false };
+  var from = parseDate(fromStr);
+  if (!from) return empty;
+  var bA = Math.max(0, Math.floor(Number(budgetA) || 0));
+  var bB = Math.max(0, Math.floor(Number(budgetB) || 0));
+  var totalBudget = bA + bB;
+  var rangeEnd = addMonths(from, 12);
+  var rangeEndStr = fmtDate(rangeEnd);
+  var deadline = parseDate(deadlineStr);
+  var deadlineStr2 = deadline ? fmtDate(deadline) : rangeEndStr;
+  var nextJan1 = (from.getUTCFullYear() + 1) + '-01-01';
+
+  function isRest(str) {
+    if (HOLIDAY_BASE_MAP[str]) return true;
+    var w = parseDate(str).getUTCDay();
+    return w === 0 || w === 6;
+  }
+  // from..rangeEnd를 날짜 배열로 펼치고 휴무 덩어리를 찾는다
+  var days = [];
+  for (var d = new Date(from.getTime()); cmpDate(d, rangeEnd) <= 0; d = addDays(d, 1)) days.push(fmtDate(d));
+  var blocks = [];
+  var cur = null;
+  days.forEach(function (s) {
+    if (isRest(s)) {
+      if (cur) cur.end = s; else cur = { start: s, end: s };
+    } else if (cur) { blocks.push(cur); cur = null; }
+  });
+  if (cur) blocks.push(cur);
+
+  // 후보 구간 [start, end] 안의 근무일이 곧 써야 할 연차 날짜다
+  var spanMap = {};
+  function addSpan(start, end) {
+    var key = start + '|' + end;
+    if (spanMap[key]) return;
+    var leaveDates = [];
+    var s = parseDate(start), e = parseDate(end);
+    for (var dd = new Date(s.getTime()); cmpDate(dd, e) <= 0; dd = addDays(dd, 1)) {
+      var ks = fmtDate(dd);
+      if (!isRest(ks)) leaveDates.push(ks);
+    }
+    spanMap[key] = { start: start, end: end, totalDays: diffDays(s, e) + 1, leaveDates: leaveDates };
+  }
+  // 경로 1: 덩어리 앞뒤 붙이기 (한쪽 최대 3일, 날짜는 days 배열 안에서만)
+  blocks.forEach(function (b) {
+    var bi = days.indexOf(b.start), ei = days.indexOf(b.end);
+    var leftRun = [];
+    for (var i = bi - 1; i >= 0 && !isRest(days[i]) && leftRun.length < 3; i--) leftRun.unshift(days[i]);
+    var rightRun = [];
+    for (var j = ei + 1; j < days.length && !isRest(days[j]) && rightRun.length < 3; j++) rightRun.push(days[j]);
+    for (var a = 0; a <= leftRun.length; a++) {
+      for (var bb = 0; bb <= rightRun.length; bb++) {
+        if (a + bb < 1 || a + bb > totalBudget) continue;
+        addSpan(a > 0 ? leftRun[leftRun.length - a] : b.start, bb > 0 ? rightRun[bb - 1] : b.end);
+      }
+    }
+  });
+  // 경로 2: 연속한 덩어리 잇기 (사이 평일을 전부 채운다).
+  // 잇는 구간의 누적 연차는 최대 4일까지만 허용한다 — P4 공휴일 플래너에서 검증된 잇기 조합
+  // (10월 개천절~한글날·성탄~신정 등)의 가장 긴 간격이 4일이며, 그 이상 이으면 주말 덩어리를
+  // 연쇄로 묶은 비현실적인 초장기 구간이 추천을 지배하게 된다.
+  var BRIDGE_GAP_MAX = 4;
+  for (var x = 0; x < blocks.length; x++) {
+    var gapLeave = 0;
+    for (var y = x + 1; y < blocks.length; y++) {
+      var prevEnd = parseDate(blocks[y - 1].end), thisStart = parseDate(blocks[y].start);
+      for (var gd = addDays(prevEnd, 1); cmpDate(gd, thisStart) < 0; gd = addDays(gd, 1)) gapLeave++;
+      if (gapLeave > Math.min(totalBudget, BRIDGE_GAP_MAX)) break;
+      if (gapLeave >= 1) addSpan(blocks[x].start, blocks[y].end);
+    }
+  }
+
+  // 예산 차감 시뮬레이션: 날짜순으로, 소진 기한 이내 날짜와 내년 날짜 모두 A(소멸이 빠른 쪽)부터 쓴다.
+  // 기한이 지난 날짜는 A로 못 쓰고, 내년 1월 1일 전 날짜는 B로 못 쓴다. 못 채우면 후보 무효.
+  function fund(leaveDates) {
+    var aLeft = bA, bLeft = bB, useA = 0, useB = 0;
+    for (var i = 0; i < leaveDates.length; i++) {
+      var ds = leaveDates[i];
+      var canA = ds <= deadlineStr2;
+      var canB = ds >= nextJan1;
+      if (canA && aLeft > 0) { aLeft--; useA++; }
+      else if (canB && bLeft > 0) { bLeft--; useB++; }
+      else return null;
+    }
+    return { useA: useA, useB: useB };
+  }
+  function comboName(start, end) {
+    var names = [];
+    var s = parseDate(start), e = parseDate(end);
+    for (var dd = new Date(s.getTime()); cmpDate(dd, e) <= 0; dd = addDays(dd, 1)) {
+      var nm = HOLIDAY_BASE_MAP[fmtDate(dd)];
+      if (nm && names.indexOf(nm) < 0) names.push(nm);
+    }
+    if (!names.length) return '주말 연결';
+    return names.length === 1 ? names[0] : names[0] + '~' + names[names.length - 1];
+  }
+  var candidates = [];
+  Object.keys(spanMap).forEach(function (k) {
+    var sp = spanMap[k];
+    if (sp.totalDays < 3 || sp.leaveDates.length < 1) return;
+    var f = fund(sp.leaveDates);
+    if (!f) return;
+    var name = comboName(sp.start, sp.end);
+    candidates.push({
+      start: sp.start, end: sp.end, totalDays: sp.totalDays,
+      leaveDays: sp.leaveDates.length, leaveDates: sp.leaveDates,
+      name: name, note: FEATURE_NOTES[name.split('~')[0]] || FEATURE_NOTES['주말 연결'],
+      useA: f.useA, useB: f.useB,
+      eff: Math.round((sp.totalDays / sp.leaveDates.length) * 100) / 100
+    });
+  });
+  if (!candidates.length || totalBudget < 1) {
+    // 조합이 하나도 없어도, 올해 연차가 있고 소진 기한이 탐색 범위 안에 있으면 소멸 임박으로 알린다
+    var noComboExpiring = bA > 0 && deadline && cmpDate(deadline, from) >= 0 && cmpDate(deadline, rangeEnd) <= 0;
+    return { hero: null, alternatives: [], all: [], expiringUnused: noComboExpiring };
+  }
+
+  function overlaps(p, q) { return p.start <= q.end && q.start <= p.end; }
+  var heroPool = candidates.slice().sort(function (p, q) {
+    if (q.totalDays !== p.totalDays) return q.totalDays - p.totalDays;
+    if (p.leaveDays !== q.leaveDays) return p.leaveDays - q.leaveDays;
+    if (q.eff !== p.eff) return q.eff - p.eff;
+    return p.start < q.start ? -1 : 1;
+  });
+  var hero = heroPool[0];
+  var cumA = hero.useA, cumB = hero.useB;
+  var altPool = candidates.filter(function (c) { return c !== hero && !overlaps(c, hero); }).sort(function (p, q) {
+    if (q.eff !== p.eff) return q.eff - p.eff;
+    if (q.totalDays !== p.totalDays) return q.totalDays - p.totalDays;
+    return p.start < q.start ? -1 : 1;
+  });
+  var picked = [];
+  function tryPick(c, usedMonths) {
+    if (picked.length >= 3) return false;
+    if (usedMonths && usedMonths[c.start.slice(0, 7)]) return false;
+    for (var i = 0; i < picked.length; i++) if (overlaps(c, picked[i])) return false;
+    if (cumA + c.useA > bA || cumB + c.useB > bB) return false;
+    picked.push(c); cumA += c.useA; cumB += c.useB;
+    return true;
+  }
+  var heroMonth = {}; heroMonth[hero.start.slice(0, 7)] = true;
+  altPool.forEach(function (c) {
+    var used = Object.assign({}, heroMonth);
+    picked.forEach(function (p) { used[p.start.slice(0, 7)] = true; });
+    tryPick(c, used);
+  });
+  if (picked.length < 3) altPool.forEach(function (c) { tryPick(c, null); });
+
+  // 올해 연차가 있는데도 선택된 조합이 올해 연차를 전혀 안 쓰면 소멸 임박으로 본다.
+  // 이 경우 소진 기한 안에서 만드는 가장 긴 조합을 대안 맨 앞에 강제 포함한다 (예산 허용 시).
+  var expiringUnused = false;
+  var selectedUseA = cumA;
+  if (bA > 0 && deadline && cmpDate(deadline, from) >= 0 && cmpDate(deadline, rangeEnd) <= 0 && selectedUseA === 0) {
+    expiringUnused = true;
+    var forcedPool = candidates.filter(function (c) {
+      return c !== hero && !overlaps(c, hero) && c.end <= deadlineStr2 && c.useA >= 1;
+    }).sort(function (p, q) {
+      if (q.totalDays !== p.totalDays) return q.totalDays - p.totalDays;
+      if (q.eff !== p.eff) return q.eff - p.eff;
+      return p.start < q.start ? -1 : 1;
+    });
+    var forced = forcedPool[0];
+    if (forced && forced.useA <= bA) {
+      picked = picked.filter(function (c) { return c !== forced && !overlaps(c, forced); });
+      picked.unshift(forced);
+      picked = picked.slice(0, 3);
+    }
+  }
+  return { hero: hero, alternatives: picked, all: [hero].concat(picked), expiringUnused: expiringUnused };
+}
+
+// 월간 달력 그리드 (일요일 시작). cell: {date, day, dow, isWeekend, holiday}
+function buildMonthGrid(year, month) {
+  function p2(n) { return (n < 10 ? '0' : '') + n; }
+  var startDow = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
+  var daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  var weeks = [], week = [];
+  for (var i = 0; i < startDow; i++) week.push(null);
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dt = new Date(Date.UTC(year, month - 1, d, 12, 0, 0));
+    var dow = dt.getUTCDay();
+    week.push({
+      date: fmtDate(dt), day: d, dow: dow,
+      isWeekend: dow === 0 || dow === 6,
+      holiday: holidayName(fmtDate(dt))
+    });
+    if (week.length === 7) { weeks.push(week); week = []; }
+  }
+  if (week.length) { while (week.length < 7) week.push(null); weeks.push(week); }
+  return { ym: year + '-' + p2(month), year: year, month: month, weeks: weeks };
 }
 
 // ---------- 표시 정책 (규칙 §5-3: 원값 보존 + 4종 표시) ----------
@@ -236,7 +456,8 @@ if (typeof module !== 'undefined' && module.exports) {
     OLD_RULE_CUTOFF: OLD_RULE_CUTOFF,
     parseDate: parseDate, fmtDate: fmtDate, addMonths: addMonths, addYears: addYears, addDays: addDays,
     annualDaysForYear: annualDaysForYear, monthlyStandardHours: monthlyStandardHours,
-    buildEvents: buildEvents, calculate: calculate, buildCalendar: buildCalendar,
+    buildEvents: buildEvents, calculate: calculate,
+    holidayName: holidayName, isHoliday: isHoliday, buildBestBreaks: buildBestBreaks, buildMonthGrid: buildMonthGrid, FEATURE_NOTES: FEATURE_NOTES,
     applyDayPolicy: applyDayPolicy, formatDays: formatDays, formatWon: formatWon, parseField: parseField
   };
 }
