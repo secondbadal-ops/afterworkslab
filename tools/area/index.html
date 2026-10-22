@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>평수 계산기 — 평·㎡ 변환, 전용·공급·전용률·평당가까지 | Afterwork Lab</title>
+<meta name="description" content="평과 제곱미터(㎡)를 양방향으로 바꾸고, 가로·세로 면적, 아파트 전용면적·공급면적·전용률, 전용률별 공급 추정, 전용·공급 기준 평당가까지 한 화면에서 계산합니다. 1평 = 400/121㎡ (약 3.3058㎡). 입력값은 서버로 전송되지 않습니다.">
+<link rel="canonical" href="https://afterworkslab.com/tools/area/">
+<link rel="stylesheet" href="/style.css">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Afterwork Lab">
+<meta property="og:title" content="평수 계산기 — 평·㎡ 변환, 전용·공급·전용률 | Afterwork Lab">
+<meta property="og:description" content="84㎡는 몇 평이고, 몇 평형일까요. 전용면적만 넣으면 전용률별 공급 추정과 평당가 착시 비교까지 바로 보여 드립니다.">
+<meta property="og:url" content="https://afterworkslab.com/tools/area/">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"평수 계산기","url":"https://afterworkslab.com/tools/area/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"1평은 몇 제곱미터인가요?","acceptedAnswer":{"@type":"Answer","text":"정확히 400/121㎡, 소수로는 약 3.3058㎡입니다. 반대로 1㎡는 정확히 0.3025평입니다."}},{"@type":"Question","name":"전용면적 84㎡는 몇 평이고 몇 평형인가요?","acceptedAnswer":{"@type":"Answer","text":"84㎡를 그대로 바꾸면 약 25.41평(실평수)입니다. 다만 분양에서 말하는 평형은 공급면적 기준이라, 전용 84㎡는 전용률에 따라 공급 약 105~120㎡가 되어 흔히 33~35평형으로 부릅니다."}},{"@type":"Question","name":"전용률이란 무엇인가요?","acceptedAnswer":{"@type":"Answer","text":"전용면적을 공급면적으로 나눈 비율입니다. 전용률 = 전용면적 ÷ 공급면적 × 100. 아파트는 보통 70~80%, 오피스텔은 50% 안팎인 경우가 많습니다."}},{"@type":"Question","name":"공급면적을 모르면 전용률 계산을 못 하나요?","acceptedAnswer":{"@type":"Answer","text":"이 계산기는 전용면적만 넣으면 전용률 70%·75%·80% 가정별 공급면적을 추정해 보여 드립니다. 추정값이라 실제 공급면적과 다를 수 있으니, 정확한 값은 분양 공고나 건축물대장에서 확인하세요."}}]}
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RK33Z9GQX3"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-RK33Z9GQX3');
+</script>
+<style>
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 2px}
+.apt-chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-weight:700;cursor:pointer}
+.apt-chip:hover{border-color:var(--brand);color:var(--brand)}
+.big-inputs{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end}
+.big-inputs label{font-weight:700;font-size:15px}
+.big-inputs input{width:100%;margin:6px 0 0;font-size:20px;font-weight:800;padding:10px 12px;border:1px solid #bbb;border-radius:8px}
+.swap-mark{font-size:20px;color:var(--muted);padding-bottom:12px}
+@media (max-width:560px){.big-inputs{grid-template-columns:1fr}.swap-mark{display:none}}
+</style>
+</head>
+<body>
+<header class="site-header"><a href="/">Afterwork Lab</a></header>
+<main>
+<h1>평수 계산기</h1>
+<p>평과 제곱미터를 바꾸는 것은 시작일 뿐입니다. 전용면적만 넣으면 <strong>몇 평형인지, 전용률이 얼마인지, 평당가가 전용 기준으로는 얼마인지</strong>까지 한 화면에서 바로 보여 드립니다. 모든 계산은 브라우저 안에서만 실행되고 입력값은 저장·전송되지 않습니다.</p>
+
+<section class="calculator">
+<h2>평 ↔ ㎡ 변환</h2>
+<div class="big-inputs">
+<label>제곱미터 (㎡)<input type="text" inputmode="decimal" id="sqm-input" placeholder="예: 84"></label>
+<span class="swap-mark">⇄</span>
+<label>평<input type="text" inputmode="decimal" id="py-input" placeholder="예: 25.41"></label>
+</div>
+<div class="chip-row" aria-label="대표 전용면적 바로 넣기">
+<button type="button" class="apt-chip" data-sqm="59">전용 59㎡</button>
+<button type="button" class="apt-chip" data-sqm="74">전용 74㎡</button>
+<button type="button" class="apt-chip" data-sqm="84">전용 84㎡</button>
+<button type="button" class="apt-chip" data-sqm="101">전용 101㎡</button>
+<button type="button" class="apt-chip" data-sqm="114">전용 114㎡</button>
+</div>
+<div class="stat-grid">
+<div class="stat primary"><span class="num" id="result-pyeong">-</span><span class="lbl">평</span></div>
+<div class="stat"><span class="num" id="result-sqm">-</span><span class="lbl">제곱미터 (㎡)</span></div>
+<div class="stat"><span class="num" id="result-sqft">-</span><span class="lbl">제곱피트 (sq ft)</span></div>
+<div class="stat"><span class="num" id="result-side">-</span><span class="lbl">정사각형 한 변 (m)</span></div>
+</div>
+<p id="area-error" class="error" role="alert"></p>
+
+<fieldset>
+<legend>가로·세로로 면적 구하기</legend>
+<label>가로 (m)<input type="text" inputmode="decimal" id="rect-w" placeholder="예: 5.2"></label>
+<label>세로 (m)<input type="text" inputmode="decimal" id="rect-h" placeholder="예: 3.4"></label>
+<p class="note">면적 <strong id="rect-sqm">-</strong>㎡ · <strong id="rect-pyeong">-</strong>평 · <strong id="rect-sqft">-</strong> sq ft</p>
+</fieldset>
+
+<div class="tool-actions">
+<button type="button" id="example-btn">예시 넣기 (전용 84㎡)</button>
+<button type="button" id="copy-btn">결과 복사</button>
+<button type="button" id="reset-btn">초기화</button>
+<span class="feedback" id="copy-feedback"></span>
+</div>
+</section>
+
+<section class="calculator" style="margin-top:16px">
+<h2>아파트 전용·공급·전용률</h2>
+<p>등기부·건축물대장에 적힌 전용면적과, 분양 광고의 공급면적을 넣으면 전용률이 나옵니다. 공급면적을 모르면 전용만 넣으세요. 전용률 가정별 공급 추정이 아래 표에 바로 바뀝니다.</p>
+<label>전용면적 (㎡)<input type="text" inputmode="decimal" id="apt-ex-input" placeholder="예: 84"></label>
+<label>공급면적 (㎡)<input type="text" inputmode="decimal" id="apt-sup-input" placeholder="모르면 비워 두세요"></label>
+<div class="stat-grid">
+<div class="stat primary"><span class="num" id="apt-rate">-</span><span class="lbl">전용률</span></div>
+<div class="stat"><span class="num" id="apt-ex-pyeong">-</span><span class="lbl">실평수 (전용 기준 평)</span></div>
+<div class="stat"><span class="num" id="apt-sup-pyeong">-</span><span class="lbl">평형 (공급 기준 평)</span></div>
+<div class="stat"><span class="num" id="apt-common">-</span><span class="lbl">주거공용면적</span></div>
+</div>
+<h3>전용만 알 때 — 전용률별 공급면적 추정</h3>
+<table>
+<thead><tr><th>가정한 전용률</th><th>공급면적 추정 (㎡)</th><th>평형 추정 (평)</th></tr></thead>
+<tbody>
+<tr><td>70% (공용이 넓은 편)</td><td id="est-sup-70">-</td><td id="est-pyeong-70">-</td></tr>
+<tr><td>75% (아파트 보통)</td><td id="est-sup-75">-</td><td id="est-pyeong-75">-</td></tr>
+<tr><td>80% (공용이 좁은 편)</td><td id="est-sup-80">-</td><td id="est-pyeong-80">-</td></tr>
+</tbody>
+</table>
+<p class="note">추정값입니다. 단지마다 주거공용면적이 달라 실제 공급면적과 다를 수 있습니다. 정확한 값은 분양 공고·건축물대장이 기준입니다. 오피스텔은 전용률이 50% 안팎까지 낮을 수 있어 이 표보다 공급이 더 크게 나올 수 있습니다.</p>
+<fieldset>
+<legend>평당가 착시 비교 — 같은 가격, 다른 기준</legend>
+<label>매매가·분양가 (만 원)<input type="text" inputmode="numeric" id="price-input" class="wide" placeholder="예: 120000"></label>
+<p class="note">전용 기준 평당가 <strong id="price-per-ex">-</strong> · 공급 기준 평당가 <strong id="price-per-sup">-</strong></p>
+<p class="note">광고의 평당가는 보통 공급면적 기준이라 낮아 보입니다. 실제로 사는 공간(전용) 기준 평당가와 나란히 보면 두 매물을 같은 잣대로 비교할 수 있습니다.</p>
+</fieldset>
+</section>
+
+<section>
+<h2>계산 공식</h2>
+<ul>
+<li><strong>1평 = 400/121㎡</strong> (약 3.3058㎡). 평 → ㎡는 평수 × 3.3058, ㎡ → 평은 ㎡ × 0.3025 (정확히 121/400)입니다.</li>
+<li>가로·세로 면적 = 가로(m) × 세로(m). 제곱피트는 ㎡ × 10.7639입니다.</li>
+<li><strong>공급면적 = 전용면적 + 주거공용면적</strong>, <strong>전용률 = 전용면적 ÷ 공급면적 × 100</strong>입니다.</li>
+<li>평당가 = 가격 ÷ 평수. 어느 면적을 평수로 바꿨는지에 따라 값이 달라지므로 기준을 함께 봐야 합니다.</li>
+<li>평은 관행 단위이고 법정 계량 단위는 ㎡입니다. 계약서·공문서의 면적은 ㎡가 기준입니다.</li>
+</ul>
+</section>
+
+<section>
+<h2>아파트 대표 평형표 (전용면적 기준)</h2>
+<table>
+<thead><tr><th>전용면적</th><th>실평수</th><th>공급 추정 (전용률 75% 가정)</th><th>흔히 부르는 평형 (대략)</th></tr></thead>
+<tbody>
+<tr><td>39㎡</td><td>11.8평</td><td>약 52.0㎡</td><td>16~17평형</td></tr>
+<tr><td>49㎡</td><td>14.8평</td><td>약 65.3㎡</td><td>20~21평형</td></tr>
+<tr><td>59㎡</td><td>17.8평</td><td>약 78.7㎡</td><td>24~26평형</td></tr>
+<tr><td>74㎡</td><td>22.4평</td><td>약 98.7㎡</td><td>29~31평형</td></tr>
+<tr><td>84㎡</td><td>25.4평</td><td>약 112.0㎡</td><td>33~35평형</td></tr>
+<tr><td>101㎡</td><td>30.6평</td><td>약 134.7㎡</td><td>40~42평형</td></tr>
+<tr><td>114㎡</td><td>34.5평</td><td>약 152.0㎡</td><td>44~46평형</td></tr>
+<tr><td>135㎡</td><td>40.8평</td><td>약 180.0㎡</td><td>51~54평형</td></tr>
+</tbody>
+</table>
+<p class="note">공급 추정과 평형은 대략값입니다. 같은 전용면적이라도 단지의 주거공용면적에 따라 공급면적과 평형은 달라집니다.</p>
+</section>
+
+<section>
+<h2>평 ↔ ㎡ 환산표</h2>
+<table>
+<thead><tr><th>평</th><th>㎡</th><th>㎡</th><th>평</th></tr></thead>
+<tbody>
+<tr><td>1평</td><td>3.31㎡</td><td>33㎡</td><td>9.98평</td></tr>
+<tr><td>3평</td><td>9.92㎡</td><td>49㎡</td><td>14.82평</td></tr>
+<tr><td>5평</td><td>16.53㎡</td><td>59㎡</td><td>17.85평</td></tr>
+<tr><td>10평</td><td>33.06㎡</td><td>74㎡</td><td>22.39평</td></tr>
+<tr><td>15평</td><td>49.59㎡</td><td>84㎡</td><td>25.41평</td></tr>
+<tr><td>20평</td><td>66.12㎡</td><td>99㎡</td><td>29.95평</td></tr>
+<tr><td>24평</td><td>79.34㎡</td><td>114㎡</td><td>34.49평</td></tr>
+<tr><td>25평</td><td>82.64㎡</td><td>132㎡</td><td>39.93평</td></tr>
+<tr><td>30평</td><td>99.17㎡</td><td>165㎡</td><td>49.91평</td></tr>
+<tr><td>34평</td><td>112.40㎡</td><td>200㎡</td><td>60.50평</td></tr>
+<tr><td>40평</td><td>132.23㎡</td><td>300㎡</td><td>90.75평</td></tr>
+<tr><td>50평</td><td>165.29㎡</td><td>1,000㎡</td><td>302.50평</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="faq">
+<h2>자주 묻는 질문</h2>
+<h3>1평은 몇 제곱미터인가요?</h3>
+<p>정확히 400/121㎡, 소수로는 약 3.3058㎡입니다. 반대로 1㎡는 정확히 0.3025평입니다. 3.3으로 어림하면 평수가 커질수록 오차가 쌓입니다.</p>
+<h3>전용면적 84㎡는 몇 평이고 몇 평형인가요?</h3>
+<p>84㎡를 그대로 바꾸면 약 25.41평(실평수)입니다. 다만 분양에서 말하는 평형은 공급면적 기준이라, 전용 84㎡는 전용률에 따라 공급 약 105~120㎡가 되어 흔히 33~35평형으로 부릅니다. 같은 집을 두고 숫자가 둘인 이유가 이것입니다.</p>
+<h3>전용률이란 무엇인가요?</h3>
+<p>전용면적을 공급면적으로 나눈 비율입니다. 전용률 = 전용면적 ÷ 공급면적 × 100. 아파트는 보통 70~80%, 오피스텔은 50% 안팎인 경우가 많습니다. 전용률이 높을수록 같은 평형에서 실제로 쓰는 공간이 넓습니다.</p>
+<h3>공급면적을 모르면 전용률 계산을 못 하나요?</h3>
+<p>이 계산기는 전용면적만 넣으면 전용률 70%·75%·80% 가정별 공급면적을 추정해 보여 드립니다. 추정값이라 실제 공급면적과 다를 수 있으니, 정확한 값은 분양 공고나 건축물대장에서 확인하세요.</p>
+</section>
+
+<p class="disclaimer">이 도구의 변환은 확정 공식(1평 = 400/121㎡)으로 계산합니다. 공급면적 추정·대표 평형은 전용률 가정에 따른 대략값이며, 실제 단지의 면적·평형과 다를 수 있습니다. 계약·청약 판단은 분양 공고, 등기부, 건축물대장의 ㎡ 표기를 기준으로 하세요.</p>
+</main>
+<footer class="site-footer"><a href="/">Afterwork Lab</a> · <a href="/tools/char-count/">글자수 세기</a> · <a href="/tools/annual-leave/">연차 계산기</a> · <a href="/tools/holidays-2027/">황금연휴 파인더</a></footer>
+<script src="calc.js"></script>
+<script src="page.js"></script>
+</body>
+</html>
