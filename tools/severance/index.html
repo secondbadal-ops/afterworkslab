@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>퇴직금 계산기 — 미사용 연차수당까지 퇴직 총 정산액 | Afterwork Lab</title>
+<meta name="description" content="입사일과 마지막 근무일, 월급만 넣으면 퇴직 전 3개월 임금과 기간 일수를 자동으로 계산해 세전 퇴직금을 구합니다. 퇴직할 때 받는 미사용 연차수당까지 더한 총 정산액을 한 화면에서 보여 드립니다. 입력값은 서버로 전송되지 않습니다.">
+<link rel="canonical" href="https://afterworkslab.com/tools/severance/">
+<link rel="stylesheet" href="/style.css">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Afterwork Lab">
+<meta property="og:title" content="퇴직금 계산기 — 퇴직 총 정산액 | Afterwork Lab">
+<meta property="og:description" content="세전 퇴직금에 미사용 연차수당을 더한 퇴직 총 정산액을 한 번에 계산합니다. 3개월 기간 일수는 날짜에서 자동 산출합니다.">
+<meta property="og:url" content="https://afterworkslab.com/tools/severance/">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"퇴직금 계산기","url":"https://afterworkslab.com/tools/severance/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"퇴직금은 어떻게 계산하나요?","acceptedAnswer":{"@type":"Answer","text":"퇴직금 = 1일 평균임금 × 30일 × (재직일수 ÷ 365)입니다. 1일 평균임금은 퇴직 전 3개월 임금 총액에 연간 상여금과 전년도 연차수당의 3/12을 더한 금액을 그 기간의 총일수(89~92일)로 나눈 값입니다. 1일 평균임금이 1일 통상임금보다 적으면 통상임금을 평균임금으로 봅니다."}},{"@type":"Question","name":"퇴직할 때 받는 미사용 연차수당도 퇴직금에 포함되나요?","acceptedAnswer":{"@type":"Answer","text":"아니요. 퇴직으로 새로 생기는 미사용 연차수당은 평균임금 산정에서 제외되는 별도 지급금입니다. 이 계산기는 퇴직금과 연차수당을 따로 계산한 뒤 합친 총 정산액을 보여 드립니다. 전년도 근무분으로 이미 받은 연차수당은 연간 금액의 3/12이 평균임금에 들어갑니다."}},{"@type":"Question","name":"1년 미만 일하면 퇴직금이 없나요?","acceptedAnswer":{"@type":"Answer","text":"계속근로기간이 1년 미만이거나 4주 평균 주 소정근로시간이 15시간 미만이면 법정 퇴직금 대상이 아닙니다. 1년에 하루라도 모자라면 법정 퇴직금은 0원이며, 회사 규정이 따로 정한 경우에만 그 규정에 따라 받을 수 있습니다."}},{"@type":"Question","name":"퇴직소득세는 왜 빠져 있나요?","acceptedAnswer":{"@type":"Answer","text":"퇴직소득세는 근속연수공제와 환산급여공제를 거쳐 계산돼 근속연수와 금액에 따라 크게 달라집니다. 이 계산기는 세전 금액까지만 계산하고, 세후 금액은 국세청 홈택스의 퇴직소득 세액계산으로 확인하시도록 안내합니다. IRP 계좌로 이전하면 과세가 이연됩니다."}}]}
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RK33Z9GQX3"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-RK33Z9GQX3');
+</script>
+<style>
+.date-inputs{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin:6px 0 2px}
+.date-inputs label{font-weight:600}
+input[type="date"]{padding:7px 8px;border:1px solid #bbb;border-radius:6px;font-size:15px;margin-left:6px;font:inherit}
+.money-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+.money-inputs label{display:block;margin:4px 0}
+.money-inputs input[type="text"]{width:150px}
+@media (max-width:560px){.money-inputs{grid-template-columns:1fr}.money-inputs input[type="text"]{width:130px}}
+</style>
+</head>
+<body>
+<header class="site-header"><a href="/">Afterwork Lab</a></header>
+<main>
+<h1>퇴직금 계산기</h1>
+<p>퇴직할 때 받는 돈을 한 번에 계산합니다. 날짜와 월급만 넣으면 퇴직 전 3개월 기간 일수(89~92일)를 달력에서 자동으로 세어 세전 퇴직금을 구하고, <strong>미사용 연차수당까지 더한 총 정산액</strong>을 보여 드립니다. 모든 계산은 브라우저 안에서만 실행되고 입력값은 저장되거나 전송되지 않습니다.</p>
+
+<div class="calculator">
+<fieldset>
+<legend>근무 기간</legend>
+<div class="date-inputs">
+<label>입사일<input type="date" id="sev-hire" value="2023-10-01"></label>
+<label>마지막 근무일<input type="date" id="sev-last" value="2026-09-30"></label>
+</div>
+<p class="note">퇴직일은 마지막 근무일 다음 날로 자동 계산합니다. 고용노동부 계산기에 넣을 때 퇴직일을 따로 계산할 필요가 없습니다.</p>
+<label><input type="checkbox" id="sev-weekly" checked> 4주 평균 주 15시간 이상 근무했습니다</label>
+</fieldset>
+
+<fieldset>
+<legend>임금 (세전)</legend>
+<div class="money-inputs">
+<label>월급 간편 입력 (원)<input type="text" id="sev-monthly" inputmode="numeric" placeholder="예: 3,000,000"></label>
+<label>퇴직 전 3개월 임금 총액 (원)<input type="text" id="sev-wage3m" inputmode="numeric" value="9,000,000"></label>
+<label>1년간 받은 상여금 (원, 없으면 비움)<input type="text" id="sev-bonus" inputmode="numeric" placeholder="0"></label>
+<label>1년간 받은 연차수당 (원, 없으면 비움)<input type="text" id="sev-leave-prior" inputmode="numeric" placeholder="0"></label>
+</div>
+<p class="note">월급을 넣으면 3개월 총액(월급 × 3)이 자동으로 채워집니다. 마지막 석 달 임금이 평소와 달랐다면 3개월 총액을 직접 고쳐 주세요. 3개월 총액에는 기본급과 각종 수당 등 근로의 대가로 받은 세전 금액을 모두 넣고, 연간 상여금·연차수당은 아래 칸에 1년치로 넣으면 3/12만 자동 반영합니다.</p>
+</fieldset>
+
+<fieldset>
+<legend>총 정산액에 더하기 (선택)</legend>
+<div class="money-inputs">
+<label>월 통상임금 (원)<input type="text" id="sev-ordinary" inputmode="numeric" placeholder="기본급+고정수당"></label>
+<label>퇴직 시 미사용 연차일수 (일)<input type="text" id="sev-unused" inputmode="numeric" placeholder="예: 10"></label>
+</div>
+<p class="note">월 통상임금을 넣으면 ① 1일 평균임금이 1일 통상임금(월 통상임금 ÷ 209 × 8)보다 적을 때 통상임금으로 보정하고 ② 미사용 연차수당(1일 통상임금 × 남은 일수)을 계산합니다. 퇴직으로 새로 생기는 연차수당은 평균임금에 넣지 않고 퇴직금에 따로 더하는 돈입니다.</p>
+</fieldset>
+
+<p class="error" id="sev-error" role="alert"></p>
+<div class="stat-grid">
+<div class="stat primary"><span class="num" id="sev-total">-</span><span class="lbl">총 정산액 (세전)</span></div>
+<div class="stat"><span class="num" id="sev-severance">-</span><span class="lbl">세전 퇴직금</span></div>
+<div class="stat"><span class="num" id="sev-daily">-</span><span class="lbl">적용 1일 임금</span></div>
+<div class="stat"><span class="num" id="sev-service">-</span><span class="lbl">재직일수</span></div>
+</div>
+<table class="result-table">
+<tr><th>평균임금 산정 기간</th><td id="sev-b-period">-</td></tr>
+<tr><th>1일 평균임금</th><td id="sev-b-wage">-</td></tr>
+<tr><th>통상임금 비교</th><td id="sev-b-basis">-</td></tr>
+<tr><th>퇴직금 산식</th><td id="sev-b-formula">-</td></tr>
+<tr><th>미사용 연차수당</th><td id="sev-leave-allow">-</td></tr>
+</table>
+<p class="note" id="sev-note"></p>
+<div class="tool-actions">
+<button type="button" class="primary" id="sev-copy-btn">결과 복사</button>
+<button type="button" id="sev-example-btn">예시 넣기 (상여금 있는 5년 근무)</button>
+<button type="button" id="sev-reset-btn">초기화</button>
+<span class="feedback" id="sev-feedback"></span>
+</div>
+</div>
+
+<h2>계산 공식</h2>
+<table>
+<tr><th>단계</th><th>계산식</th></tr>
+<tr><td>재직일수</td><td>마지막 근무일 − 입사일 + 1일 (퇴직일 = 마지막 근무일 + 1일)</td></tr>
+<tr><td>1일 평균임금</td><td>(퇴직 전 3개월 임금 + 연간 상여금 × 3/12 + 전년도 연차수당 × 3/12) ÷ 3개월 기간 일수</td></tr>
+<tr><td>1일 통상임금</td><td>월 통상임금 ÷ 209 × 8 (주 40시간 기준). 평균임금보다 크면 이쪽을 적용</td></tr>
+<tr><td>세전 퇴직금</td><td>적용 1일 임금 × 30 × 재직일수 ÷ 365</td></tr>
+<tr><td>미사용 연차수당</td><td>1일 통상임금 × 미사용 연차일수 (퇴직금과 별도 지급, 총 정산액에만 합산)</td></tr>
+</table>
+<p class="assumption">근거: 근로자퇴직급여 보장법 제4조·제8조(계속근로 1년에 30일분 이상 평균임금), 근로기준법 제2조(평균임금 정의와 통상임금 보정). 지급 요건은 계속근로기간 1년 이상 + 4주 평균 주 15시간 이상이며, 회사는 퇴직일부터 14일 안에 지급해야 합니다.</p>
+
+<h2>평균임금에 들어가는 돈, 빠지는 돈</h2>
+<table>
+<tr><th>항목</th><th>반영</th></tr>
+<tr><td>기본급·고정수당·연장/야간/휴일수당</td><td>3개월 동안 받은 전액 포함</td></tr>
+<tr><td>정기 상여금</td><td>1년 지급액 × 3/12 포함</td></tr>
+<tr><td>전년도 근무분 미사용 연차수당</td><td>1년 지급액 × 3/12 포함</td></tr>
+<tr><td>퇴직하면서 정산받는 연차수당</td><td>평균임금에서 제외 — 별도로 계산해 총 정산액에 합산</td></tr>
+<tr><td>경조사비·출장비 등 실비</td><td>제외 (근로의 대가가 아님)</td></tr>
+</table>
+
+<h2>계산 예시</h2>
+<table>
+<tr><th>사례</th><th>조건</th><th>세전 퇴직금</th></tr>
+<tr><td>월급 300만 원 · 3년</td><td>입사 2023-10-01, 마지막 근무 2026-09-30, 3개월 임금 900만 원 (기간 92일, 1일 평균임금 97,826원)</td><td>8,812,388원</td></tr>
+<tr><td>상여금 있는 5년</td><td>3개월 임금 1,260만 원 + 연간 상여 600만 원 + 전년도 연차수당 60만 원 (1일 평균임금 154,891원)</td><td>23,246,426원</td></tr>
+<tr><td>딱 1년</td><td>재직 365일, 3개월 임금 900만 원</td><td>2,934,783원</td></tr>
+</table>
+<p class="assumption">위 예시는 이 페이지의 계산기로 직접 계산한 값입니다. '예시 넣기' 버튼을 누르면 두 번째 사례가 입력됩니다.</p>
+
+<h2>자주 묻는 질문</h2>
+<div class="faq">
+<h3>퇴직금은 세전인가요, 세후인가요?</h3>
+<p>이 계산기의 결과는 세전 금액입니다. 퇴직소득세는 근속연수공제 등을 거쳐 따로 계산되며, IRP 계좌로 이전하면 세금을 떼지 않고 미뤄 둡니다. 세후 금액은 국세청 홈택스의 퇴직소득 세액계산으로 확인하세요.</p>
+<h3>마지막 3개월에 무급휴가가 있어 임금이 줄었으면 어떻게 되나요?</h3>
+<p>월 통상임금을 넣어 보세요. 1일 평균임금이 1일 통상임금보다 적으면 법에 따라 통상임금을 평균임금으로 보기 때문에 퇴직금이 그만큼 올라갑니다. 다만 육아휴직처럼 평균임금 산정에서 빼는 기간이 있는 경우는 이 계산기에 반영되지 않으니 고용노동부 계산기로 함께 확인하세요.</p>
+<h3>DC형 퇴직연금 가입자도 이 계산기를 쓰면 되나요?</h3>
+<p>아니요. DC형은 회사가 매년 임금의 1/12 이상을 본인 계좌에 넣어 운용한 금액을 받는 방식이라 이 공식과 다릅니다. 이 계산기는 퇴직금 제도와 DB형(퇴직 시점 평균임금 기준)에 맞는 계산입니다.</p>
+<h3>연차 발생일수와 정산이 먼저 궁금합니다</h3>
+<p>입사일 기준으로 발생한 연차와 퇴직 시 정산 대상 일수는 <a href="/tools/annual-leave/">연차 계산기 (퇴직 정산)</a>에서 먼저 계산할 수 있습니다. 거기서 나온 미사용 일수를 이 계산기의 '미사용 연차일수'에 넣으면 총 정산액이 완성됩니다.</p>
+</div>
+
+<p class="disclaimer">이 계산기는 일반적인 경우의 예상액을 계산하는 참고 도구입니다. 평균임금 산정 제외 기간(육아휴직·업무상 재해 휴업 등), 임금 구성의 임금성 판단, 중간정산, 임원 퇴직급여는 반영하지 않습니다. 실제 지급액과 다르면 회사에 산정 내역을 요청하고, 해결이 안 되면 고용노동부 상담센터(1350)로 문의하세요. 퇴직소득세 계산은 국세청 홈택스를 이용하세요.</p>
+</main>
+<footer class="site-footer"><a href="/">Afterwork Lab</a> · <a href="/tools/annual-leave/">연차 계산기</a> · <a href="/tools/date-calc/">날짜 계산기</a></footer>
+<script src="calc.js"></script>
+<script src="page.js"></script>
+</body>
+</html>
