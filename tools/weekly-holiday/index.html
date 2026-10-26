@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>주휴수당 계산기 — 포함 시급 검증·못 받은 금액까지 | Afterwork Lab</title>
+<meta name="description" content="시급과 주 근무시간으로 주휴수당과 주급, 월급 환산을 계산합니다. 계약서에 적힌 '주휴 포함 시급'을 기본시급으로 나눠 최저임금을 지키는지 판정하고, 실제로 받은 주급과의 차액과 누적 미지급 추정까지 한 화면에서 보여 드립니다. 입력값은 서버로 전송되지 않습니다.">
+<link rel="canonical" href="https://afterworkslab.com/tools/weekly-holiday/">
+<link rel="stylesheet" href="/style.css">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Afterwork Lab">
+<meta property="og:title" content="주휴수당 계산기 — 포함 시급 검증·미지급 대조 | Afterwork Lab">
+<meta property="og:description" content="주휴수당 발생액 계산에 더해, 주휴 포함 시급의 최저임금 판정과 실수령 차액·누적 추정까지 한 번에 확인합니다.">
+<meta property="og:url" content="https://afterworkslab.com/tools/weekly-holiday/">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"주휴수당 계산기","url":"https://afterworkslab.com/tools/weekly-holiday/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"주휴수당은 누가 받나요?","acceptedAnswer":{"@type":"Answer","text":"4주를 평균한 1주 소정근로시간이 15시간 이상이고, 그 주의 소정근로일을 개근한 근로자가 받습니다. 아르바이트·계약직도 같고, 상시 4명 이하의 작은 사업장에도 적용됩니다. 지각·조퇴는 결근이 아니고, 연차휴가를 쓴 날도 개근으로 봅니다."}},{"@type":"Question","name":"시급에 주휴수당이 포함됐다는 계약은 괜찮은가요?","acceptedAnswer":{"@type":"Answer","text":"계약서에 기본시급과 주휴수당이 명확히 나뉘어 적혀 있고, 그렇게 나눈 기본시급이 최저시급 이상일 때만 문제가 없습니다. 주 15~40시간 근무라면 기본시급은 포함 시급 ÷ 1.2이며, 2026년 기준 포함 시급이 12,384원보다 낮으면 기본시급이 최저시급 10,320원에 미달합니다."}},{"@type":"Question","name":"주휴수당을 못 받았으면 언제까지 청구할 수 있나요?","acceptedAnswer":{"@type":"Answer","text":"주휴수당은 임금이라 임금채권 소멸시효인 3년 안에는 청구할 수 있습니다. 근로계약서, 출퇴근 기록, 급여명세서와 통장 내역을 모아 사업주에게 먼저 요청하고, 해결되지 않으면 고용노동부 상담센터(1350)나 노동포털에 진정할 수 있습니다."}},{"@type":"Question","name":"월급제인데 주휴수당이 따로 안 나오면 못 받는 건가요?","acceptedAnswer":{"@type":"Answer","text":"월급제 근로자는 보통 월급 안에 주휴수당이 포함돼 있습니다. 주 40시간 근무라면 월급에 주휴 35시간이 들어간 209시간이 기준이라, 월급을 209시간으로 나눈 금액이 최저시급 이상인지로 확인합니다."}}]}
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RK33Z9GQX3"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-RK33Z9GQX3');
+</script>
+<style>
+.wh-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+.wh-inputs label{display:block;margin:4px 0;font-weight:600}
+.wh-inputs input[type="text"]{width:150px}
+.wh-check{font-weight:600}
+.wh-verdict{font-size:16px;font-weight:800}
+@media (max-width:560px){.wh-inputs{grid-template-columns:1fr}.wh-inputs input[type="text"]{width:130px}}
+</style>
+</head>
+<body>
+<header class="site-header"><a href="/">Afterwork Lab</a></header>
+<main>
+<h1>주휴수당 계산기</h1>
+<p>주휴수당이 얼마인지에서 끝나지 않고, <strong>제대로 받고 있는지</strong>까지 확인합니다. 시급과 주 근무시간으로 주휴수당·주급·월급 환산을 계산하고, 계약서의 '주휴 포함 시급'이 최저임금을 지키는지 판정하고, 실제로 받은 주급과의 차액과 누적 추정까지 한 화면에서 보여 드립니다. 모든 계산은 브라우저 안에서만 실행되고 입력값은 저장되거나 전송되지 않습니다.</p>
+
+<div class="calculator">
+<fieldset>
+<legend>주휴수당 계산</legend>
+<div class="wh-inputs">
+<label>기본시급 (원)<input type="text" id="wh-wage" inputmode="numeric" value="10,320"></label>
+<label>주 소정근로시간 (시간)<input type="text" id="wh-hours" inputmode="decimal" value="40"></label>
+</div>
+<p class="note">주 소정근로시간은 근로계약서에 정한 시간(휴게·연장근로 제외)입니다. 주마다 다르면 4주 평균을 넣어 주세요. 2026년 최저시급은 10,320원입니다.</p>
+<label class="wh-check"><input type="checkbox" id="wh-attended" checked> 그 주 소정근로일을 개근했습니다 (지각·조퇴는 결근이 아닙니다)</label>
+</fieldset>
+
+<p class="error" id="wh-error" role="alert"></p>
+<div class="stat-grid">
+<div class="stat primary"><span class="num" id="wh-weekly-pay">-</span><span class="lbl">기대 주급 (세전)</span></div>
+<div class="stat"><span class="num" id="wh-holiday-pay">-</span><span class="lbl">1주 주휴수당</span></div>
+<div class="stat"><span class="num" id="wh-holiday-hours">-</span><span class="lbl">주휴시간</span></div>
+<div class="stat"><span class="num" id="wh-monthly-pay">-</span><span class="lbl">월급 환산 (세전)</span></div>
+</div>
+<table class="result-table">
+<tr><th>자격 판정</th><td id="wh-b-elig">-</td></tr>
+<tr><th>주 기본급</th><td id="wh-b-base">-</td></tr>
+<tr><th>주휴 산식</th><td id="wh-b-formula">-</td></tr>
+<tr><th>월 환산 내역</th><td id="wh-b-month">-</td></tr>
+</table>
+<p class="note" id="wh-note"></p>
+
+<fieldset>
+<legend>주휴 포함 시급 검증</legend>
+<div class="wh-inputs">
+<label>계약서의 포함 시급 (원)<input type="text" id="wh-inc-wage" inputmode="numeric" placeholder="예: 12,000"></label>
+<label>그 일자리의 주 소정근로시간<input type="text" id="wh-inc-hours" inputmode="decimal" placeholder="예: 20"></label>
+<label>적용 연도
+<select id="wh-inc-year">
+<option value="2025">2025년 · 최저 10,030원</option>
+<option value="2026" selected>2026년 · 최저 10,320원</option>
+<option value="2027">2027년 · 최저 10,700원</option>
+</select></label>
+</div>
+<p class="note">개근한 주를 전제로, 포함 시급을 기본시급과 주휴분으로 나눠 최저임금과 비교합니다. 포함 시급 계약은 기본시급과 주휴수당이 계약서에 명확히 나뉘어 적혀 있어야 합니다.</p>
+<table class="result-table">
+<tr><th>역산한 기본시급</th><td id="wh-inc-base">-</td></tr>
+<tr><th>판정</th><td class="wh-verdict" id="wh-inc-verdict">-</td></tr>
+<tr><th>최저를 맞는 최소 포함 시급</th><td id="wh-inc-required">-</td></tr>
+<tr><th>한 주 나눈 내역</th><td id="wh-inc-detail">-</td></tr>
+</table>
+</fieldset>
+
+<fieldset>
+<legend>실제로 받은 금액과 대조</legend>
+<div class="wh-inputs">
+<label>실제로 받은 주급 (원, 세전)<input type="text" id="wh-actual-pay" inputmode="numeric" placeholder="예: 206,400"></label>
+<label>이 조건으로 일한 주 수<input type="text" id="wh-weeks" inputmode="numeric" placeholder="예: 52"></label>
+</div>
+<table class="result-table">
+<tr><th>주 차액 (기대 − 실수령)</th><td id="wh-c-shortfall">-</td></tr>
+<tr><th>누적 차액 추정</th><td id="wh-c-cumulative">-</td></tr>
+<tr><th>주휴 전액을 못 받았다면 (주휴수당 × 주 수)</th><td id="wh-c-unpaid">-</td></tr>
+</table>
+<p class="note" id="wh-c-note"></p>
+</fieldset>
+
+<div class="tool-actions">
+<button type="button" class="primary" id="wh-copy-btn">결과 복사</button>
+<button type="button" id="wh-example-btn">예시 넣기 (주 20시간·포함 시급 검증)</button>
+<button type="button" id="wh-reset-btn">초기화</button>
+<span class="feedback" id="wh-feedback"></span>
+</div>
+</div>
+
+<h2>계산 공식</h2>
+<table>
+<tr><th>단계</th><th>계산식</th></tr>
+<tr><td>지급 요건</td><td>4주 평균 주 소정근로시간 15시간 이상 + 그 주 소정근로일 개근</td></tr>
+<tr><td>주휴시간</td><td>주 소정근로시간 ÷ 40 × 8시간 (주 40시간 이상이면 최대 8시간)</td></tr>
+<tr><td>주휴수당</td><td>주휴시간 × 기본시급</td></tr>
+<tr><td>월 환산</td><td>월 유급시간 = (주 시간 + 주휴시간) × 365 ÷ 7 ÷ 12를 반올림한 시간, 월급 환산 = 시급 × 월 유급시간</td></tr>
+<tr><td>포함 시급 역산</td><td>기본시급 = 포함 시급 × 주 시간 ÷ (주 시간 + 주휴시간). 주 15~40시간이면 포함 시급 ÷ 1.2와 같습니다</td></tr>
+</table>
+<p class="assumption">근거: 근로기준법 제55조(1주에 평균 1회 이상 유급휴일), 같은 법 시행령 제30조(소정근로일을 개근한 근로자에게 부여), 제18조 제3항(4주 평균 주 15시간 미만은 휴일 규정 제외), 시행령 별표 1(상시 4명 이하 사업장에도 주휴 적용). 월 환산 시간은 반올림 관례를 따라 풀타임 기준 월 209시간이 되며, 반올림하지 않은 주 단위 금액에 4.345주를 곱하는 방식과는 몇천 원 차이가 날 수 있습니다.</p>
+
+<h2>주 근무시간별 주휴수당 (2026년 최저시급 10,320원)</h2>
+<table>
+<tr><th>주 소정근로시간</th><th>주휴시간</th><th>1주 주휴수당</th></tr>
+<tr><td>14시간</td><td>없음 (15시간 미만)</td><td>0원</td></tr>
+<tr><td>15시간</td><td>3시간</td><td>30,960원</td></tr>
+<tr><td>20시간</td><td>4시간</td><td>41,280원</td></tr>
+<tr><td>25시간</td><td>5시간</td><td>51,600원</td></tr>
+<tr><td>30시간</td><td>6시간</td><td>61,920원</td></tr>
+<tr><td>40시간 이상</td><td>8시간</td><td>82,560원</td></tr>
+</table>
+
+<h2>주휴 포함 시급, 최저를 맞추는 최소 금액</h2>
+<table>
+<tr><th>적용 연도</th><th>최저시급</th><th>최소 포함 시급 (주 15~40시간)</th></tr>
+<tr><td>2025년</td><td>10,030원</td><td>12,036원</td></tr>
+<tr><td>2026년</td><td>10,320원</td><td>12,384원</td></tr>
+<tr><td>2027년</td><td>10,700원</td><td>12,840원</td></tr>
+</table>
+<p class="assumption">포함 시급이 이 금액보다 낮으면, 기본시급으로 나눴을 때 최저시급에 미달합니다. 주 40시간을 넘는 근무는 주휴시간이 8시간에서 멈춰 비율이 달라지므로 위 검증 칸에서 직접 계산해 보세요.</p>
+
+<h2>계산 예시</h2>
+<table>
+<tr><th>사례</th><th>조건</th><th>결과</th></tr>
+<tr><td>풀타임</td><td>시급 10,320원 · 주 40시간 · 개근</td><td>주휴수당 82,560원 · 주급 495,360원 · 월 환산 2,156,880원</td></tr>
+<tr><td>주 20시간 알바</td><td>시급 10,320원 · 주 20시간 · 개근</td><td>주휴수당 41,280원 · 주급 247,680원 · 월 환산 1,073,280원</td></tr>
+<tr><td>시급이 높은 단시간</td><td>시급 12,000원 · 주 30시간 · 개근</td><td>주휴수당 72,000원 · 월 환산 1,872,000원</td></tr>
+<tr><td>포함 시급 미달</td><td>포함 시급 12,000원 · 주 20시간 · 2026년</td><td>기본시급 10,000원으로 역산돼 최저 10,320원에 미달 (필요한 포함 시급 12,384원)</td></tr>
+</table>
+<p class="assumption">위 예시는 이 페이지의 계산기로 직접 계산한 값입니다. '예시 넣기' 버튼을 누르면 주 20시간 사례와 포함 시급 검증이 함께 입력됩니다.</p>
+
+<h2>자주 묻는 질문</h2>
+<div class="faq">
+<h3>주휴수당은 누가 받나요?</h3>
+<p>4주를 평균한 1주 소정근로시간이 15시간 이상이고, 그 주의 소정근로일을 개근한 근로자가 받습니다. 아르바이트·계약직도 같고, 상시 4명 이하의 작은 사업장에도 적용됩니다. 지각·조퇴는 결근이 아니고, 연차휴가를 쓴 날도 개근으로 봅니다.</p>
+<h3>시급에 주휴수당이 포함됐다는 계약은 괜찮은가요?</h3>
+<p>계약서에 기본시급과 주휴수당이 명확히 나뉘어 적혀 있고, 그렇게 나눈 기본시급이 최저시급 이상일 때만 문제가 없습니다. 주 15~40시간 근무라면 기본시급은 포함 시급 ÷ 1.2이며, 2026년 기준 포함 시급이 12,384원보다 낮으면 기본시급이 최저시급 10,320원에 미달합니다.</p>
+<h3>주휴수당을 못 받았으면 언제까지 청구할 수 있나요?</h3>
+<p>주휴수당은 임금이라 임금채권 소멸시효인 3년 안에는 청구할 수 있습니다. 근로계약서, 출퇴근 기록, 급여명세서와 통장 내역을 모아 사업주에게 먼저 요청하고, 해결되지 않으면 고용노동부 상담센터(1350)나 노동포털에 진정할 수 있습니다.</p>
+<h3>월급제인데 주휴수당이 따로 안 나오면 못 받는 건가요?</h3>
+<p>월급제 근로자는 보통 월급 안에 주휴수당이 포함돼 있습니다. 주 40시간 근무라면 월급에 주휴 35시간이 들어간 209시간이 기준이라, 월급을 209시간으로 나눈 금액이 최저시급 이상인지로 확인합니다. 퇴직할 때의 정산은 <a href="/tools/severance/">퇴직금 계산기</a>에서 이어서 볼 수 있습니다.</p>
+</div>
+
+<p class="disclaimer">이 계산기는 일반적인 경우의 예상액을 계산하는 참고 도구입니다. 주마다 근무시간이 다른 경우의 주별 판정, 마지막 주의 근로관계 유지 여부, 연장·야간·휴일 가산수당, 4대보험·세금 공제는 반영하지 않습니다. 누적 추정액은 같은 조건이 매주 이어졌다는 가정의 단순 계산이며 실제 청구액과 다를 수 있습니다. 개별 상황은 고용노동부 상담센터(1350)로 확인하세요.</p>
+</main>
+<footer class="site-footer"><a href="/">Afterwork Lab</a> · <a href="/tools/severance/">퇴직금 계산기</a> · <a href="/tools/annual-leave/">연차 계산기</a> · <a href="/tools/date-calc/">날짜 계산기</a></footer>
+<script src="calc.js"></script>
+<script src="page.js"></script>
+</body>
+</html>
