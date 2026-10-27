@@ -93,7 +93,9 @@
     };
   }
 
-  // 보증금 조정표: 남길 보증금을 1,000만 원 단위 아래위 2단계씩 바꿀 때의 상한 월세  function depositTable(input) {    if (!input) return null;
+  // 보증금 조정표: 남길 보증금을 1,000만 원 단위 아래위 2단계씩 바꿀 때의 상한 월세
+  function depositTable(input) {
+    if (!input) return null;
     if (!isValidAmount(input.jeonse) || input.jeonse <= 0) return null;
     if (!isValidAmount(input.keepDeposit) || input.keepDeposit > input.jeonse) return null;    if (!isValidBaseRate(input.baseRate)) return null;
     var cap = capRate(input.baseRate);
