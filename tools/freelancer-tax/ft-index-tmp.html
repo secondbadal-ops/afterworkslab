@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>프리랜서 종합소득세 환급 계산기 — 경비율 손익분기까지 | Afterwork Lab</title>
+<meta name="description" content="프리랜서 연 수입과 경비율로 5월 종합소득세 정산(환급·추가 납부)을 추정합니다. 환급으로 바뀌는 손익분기 경비율, 경비율 구간별 비교표, 실제 경비 금액과의 대조까지 한 화면에서 보여 드립니다. 사업소득만 있는 경우의 간이 추정이며 입력값은 서버로 전송되지 않습니다.">
+<link rel="canonical" href="https://afterworkslab.com/tools/freelancer-tax/">
+<link rel="stylesheet" href="/style.css">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Afterwork Lab">
+<meta property="og:title" content="프리랜서 종합소득세 환급 계산기 — 경비율 손익분기까지 | Afterwork Lab">
+<meta property="og:description" content="3.3% 정산을 단계별로 계산하고, 환급으로 바뀌는 경비율과 구간별 비교, 실제 경비 대조까지 한 번에 확인합니다.">
+<meta property="og:url" content="https://afterworkslab.com/tools/freelancer-tax/">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"프리랜서 종합소득세 환급 계산기","url":"https://afterworkslab.com/tools/freelancer-tax/","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"3.3%를 떼면 세금이 끝난 것 아닌가요?","acceptedAnswer":{"@type":"Answer","text":"아닙니다. 3.3%(소득세 3% + 지방소득세 0.3%)는 경비를 전혀 반영하지 않고 미리 낸 돈입니다. 다음 해 5월 종합소득세 신고에서 수입에서 경비와 공제를 뺀 실제 세금과 비교해, 많이 냈으면 환급받고 적게 냈으면 추가로 냅니다. 신고하지 않으면 환급도 받을 수 없습니다."}},{"@type":"Question","name":"제 경비율은 몇 %인가요?","acceptedAnswer":{"@type":"Answer","text":"경비율은 업종코드마다 다르고 매년 고시됩니다. 장부를 쓰지 않는 경우 직전 연도 수입이 업종별 기준보다 적으면 단순경비율, 크면 기준경비율이 적용됩니다. 국세청 홈택스에서 본인 업종코드의 단순경비율·기준경비율을 확인해 이 계산기에 넣어 보세요. 실제로 쓴 경비가 경비율로 인정되는 금액보다 많으면 장부를 써서 실제 경비로 신고하는 편이 유리할 수 있습니다."}},{"@type":"Question","name":"손익분기 경비율이 뭔가요?","acceptedAnswer":{"@type":"Answer","text":"내 수입과 공제 조건에서 환급과 추가 납부가 갈리는 경비율입니다. 인정받는 경비율이 이 값보다 높으면 미리 낸 3.3%가 확정 세액보다 많아 환급이 나오고, 낮으면 추가로 냅니다. 예를 들어 연 수입 3,600만 원·본인 1인 기준 손익분기 경비율은 51.3%입니다."}},{"@type":"Question","name":"5월 신고를 놓쳤으면 환급을 못 받나요?","acceptedAnswer":{"@type":"Answer","text":"법정신고기한부터 5년 안에는 기한후신고로 환급을 청구할 수 있습니다. 이미 신고했지만 공제를 빠뜨린 경우에는 경정청구를 씁니다. 환급만 받는 경우라면 기한후신고를 해도 납부할 세금이 없어 가산세 부담이 거의 없습니다."}},{"@type":"Question","name":"회사 월급과 프리랜서 수입이 둘 다 있으면 어떻게 계산하나요?","acceptedAnswer":{"@type":"Answer","text":"근로소득과 사업소득을 합산해 누진세율을 적용하므로 이 계산기(사업소득만 있는 경우)로는 정확히 계산할 수 없습니다. 부업 소득은 본업 소득 위에 얹혀 높은 세율 구간이 적용되는 경우가 많아, 3.3%만으로는 모자라 추가 납부가 나오는 일이 흔합니다. 합산 신고가 필요하면 홈택스 신고 화면이나 세무 전문가에게 확인하세요."}}]}
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RK33Z9GQX3"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-RK33Z9GQX3');
+</script><style>
+.ft-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+.ft-inputs label{display:block;margin:4px 0;font-weight:600}
+.ft-inputs input[type="text"]{width:150px}
+.ft-range{width:100%;margin:6px 0 2px}
+.ft-verdict{font-size:16px;font-weight:800}
+@media (max-width:560px){.ft-inputs{grid-template-columns:1fr}.ft-inputs input[type="text"]{width:130px}}</style>
+</head><body>
+<header class="site-header"><a href="/">Afterwork Lab</a></header>
+<main><h1>프리랜서 종합소득세 환급 계산기</h1>
+<p>3.3%를 떼고 받은 돈이 5월에 <strong>얼마나 돌아오는지, 아니면 얼마나 더 내는지</strong>를 계산합니다. 연 수입과 경비율만 넣으면 정산 결과를 단계별로 보여 주고, 환급으로 바뀌는 <strong>손익분기 경비율</strong>과 경비율 구간별 비교, 실제 경비 금액과의 대조까지 한 화면에서 확인할 수 있습니다. 사업소득만 있는 경우의 간이 추정이며, 모든 계산은 브라우저 안에서만 실행되고 입력값은 저장되거나 전송되지 않습니다.</p>
+<div class="calculator">
+<fieldset>
+<legend>내 조건</legend>
+<div class="ft-inputs">
+<label>연 수입금액 (원, 세전)<input type="text" id="ft-income" inputmode="numeric" value="36,000,000"></label>
+<label>기본공제 인원 (본인 포함)<input type="text" id="ft-dependents" inputmode="numeric" value="1"></label>
+<label>경비율 (%)<input type="text" id="ft-rate" inputmode="decimal" value="60"></label>
+<label>추가 소득공제 (원, 연금보험료 등)<input type="text" id="ft-extra" inputmode="numeric" placeholder="예: 1,800,000"></label>
+</div>
+<input type="range" class="ft-range" id="ft-rate-range" min="0" max="90" step="1" value="60" aria-label="경비율 슬라이더"><p class="note">경비율은 슬라이더로 움직여도 됩니다. 내 업종의 단순경비율·기준경비율은 국세청 홈택스에서 업종코드로 확인하세요. 추가 소득공제는 국민연금 보험료처럼 소득에서 빼 주는 금액입니다 (없으면 비워 두세요).</p>
+</fieldset><p class="error" id="ft-error" role="alert"></p><div class="stat-grid">
+<div class="stat primary"><span class="num" id="ft-settlement">-</span><span class="lbl">5월 정산 (환급 또는 추가 납부)</span></div>
+<div class="stat"><span class="num" id="ft-total-tax">-</span><span class="lbl">확정 세액 (지방세 포함)</span></div>
+<div class="stat"><span class="num" id="ft-withheld">-</span><span class="lbl">이미 낸 3.3%</span></div>
+<div class="stat"><span class="num" id="ft-effective">-</span><span class="lbl">수입 대비 실효세율</span></div>
+</div>
+<table class="result-table">
+<tr><th>필요경비</th><td id="ft-b-expense">-</td></tr>
+<tr><th>사업소득금액</th><td id="ft-b-business">-</td></tr>
+<tr><th>과세표준</th><td id="ft-b-base">-</td></tr>
+<tr><th>산출세액</th><td id="ft-b-assessed">-</td></tr>
+<tr><th>결정세액 내역</th><td id="ft-b-decided">-</td></tr>
+<tr class="total"><th>정산 결과</th><td id="ft-b-total">-</td></tr>
+</table>
+<p class="note" id="ft-note"></p>
+
+<fieldset>
+<legend>손익분기 경비율 — 몇 %부터 환급인가</legend>
+<table class="result-table">
+<tr><th>판정</th><td class="ft-verdict" id="ft-be-text">-</td></tr>
+<tr><th>그때의 필요경비</th><td id="ft-be-amount">-</td></tr>
+</table>
+<p class="note">같은 수입·공제 조건에서 경비율만 바꿔 정산이 0이 되는 지점을 역산한 값입니다. 실제로 인정받는 경비율이 이보다 높으면 환급, 낮으면 추가 납부입니다.</p>
+</fieldset>
+
+<fieldset>
+<legend>경비율 구간별 비교</legend>
+<table>
+<thead><tr><th>경비율</th><th>필요경비</th><th>확정 세액</th><th>정산</th></tr></thead>
+<tbody id="ft-sens-body"></tbody>
+</table>
+<p class="note">내 경비율과 가까운 행이 굵게 표시됩니다. 경비율이 10%p 오르면 정산이 얼마나 달라지는지 한눈에 볼 수 있습니다.</p>
+</fieldset>
+
+<fieldset>
+<legend>실제 경비 금액과 대조</legend>
+<div class="ft-inputs"><label>실제로 쓴 경비 (원, 연 합계)<input type="text" id="ft-actual-amount" inputmode="numeric" placeholder="예: 21,600,000"></label>
+</div>
+<table class="result-table">
+<tr><th>실제 경비의 경비율 환산</th><td id="ft-a-rate">-</td></tr>
+<tr><th>실제 경비 기준 정산</th><td id="ft-a-settlement">-</td></tr>
+<tr><th>어느 방식이 유리한가</th><td id="ft-a-diff">-</td></tr>
+</table>
+<p class="note">장부를 써서 실제 경비로 신고할 때와 경비율로 신고할 때를 비교합니다. 실제 경비는 업무용 지출의 증빙(카드·현금영수증·세금계산서)이 있어야 인정됩니다.</p>
+</fieldset>
+
+<div class="tool-actions">
+<button type="button" class="primary" id="ft-copy-btn">결과 복사</button>
+<button type="button" id="ft-example-btn">예시 넣기 (수입 3,600만 원·경비율 50%·실제 경비 대조)</button>
+<button type="button" id="ft-reset-btn">초기화</button>
+<span class="feedback" id="ft-feedback"></span>
+</div></div>
+
+<h2>계산 공식</h2>
+<table>
+<tr><th>단계</th><th>계산식</th></tr>
+<tr><td>필요경비</td><td>연 수입 × 경비율</td></tr>
+<tr><td>과세표준</td><td>수입 − 필요경비 − 기본공제(150만 원 × 인원) − 추가 소득공제, 0보다 작으면 0</td></tr>
+<tr><td>산출세액</td><td>과세표준 × 누진세율 − 누진공제 (소득세법 제55조, 원 미만 절사)</td></tr>
+<tr><td>결정세액</td><td>산출세액 − 표준세액공제 70,000원 (근로소득이 없는 경우). 지방소득세는 결정세액의 10%</td></tr>
+<tr><td>정산</td><td>이미 낸 원천징수(수입 × 3% + 그 10%) − 확정 세액. 양수면 환급, 음수면 추가 납부</td></tr>
+</table>
+<p class="assumption">근거: 소득세법 제55조(세율), 제127조·제129조와 시행령 제184조(사업소득 원천징수 3%), 지방소득세는 소득세의 10%. 이 계산기는 사업소득만 있고 다른 소득이 없는 경우 전용입니다. 근로소득 합산, 표준세액공제 외 세액공제·감면, 기준경비율의 주요경비 별도 계산, 가산세는 반영하지 않으며, 실제 신고액은 공제 내역에 따라 이 추정치보다 유리해질 수 있습니다.</p>
+<h2>종합소득세 세율표 (소득세법 제55조)</h2>
+<table>
+<tr><th>과세표준</th><th>세율</th><th>누진공제</th></tr>
+<tr><td>1,400만 원 이하</td><td>6%</td><td>—</td></tr>
+<tr><td>1,400만 원 초과 5,000만 원 이하</td><td>15%</td><td>126만 원</td></tr>
+<tr><td>5,000만 원 초과 8,800만 원 이하</td><td>24%</td><td>576만 원</td></tr>
+<tr><td>8,800만 원 초과 1억 5,000만 원 이하</td><td>35%</td><td>1,544만 원</td></tr>
+<tr><td>1억 5,000만 원 초과 3억 원 이하</td><td>38%</td><td>1,994만 원</td></tr>
+<tr><td>3억 원 초과 5억 원 이하</td><td>40%</td><td>2,594만 원</td></tr>
+<tr><td>5억 원 초과 10억 원 이하</td><td>42%</td><td>3,594만 원</td></tr>
+<tr><td>10억 원 초과</td><td>45%</td><td>6,594만 원</td></tr>
+</table>
+
+<h2>수입별 손익분기 경비율 (본인 1인·추가 공제 없음)</h2>
+<table>
+<tr><th>연 수입</th><th>손익분기 경비율</th><th>경비율 60%이면</th></tr>
+<tr><td>1,200만 원</td><td>27.8%</td><td>환급 255,200원</td></tr>
+<tr><td>2,400만 원</td><td>38.9%</td><td>환급 334,400원</td></tr>
+<tr><td>3,600만 원</td><td>51.3%</td><td>환급 413,600원</td></tr>
+<tr><td>5,000만 원</td><td>59.3%</td><td>환급 60,500원</td></tr>
+<tr><td>1억 원</td><td>69.7%</td><td>추가 납부 1,589,500원</td></tr>
+</table>
+<p class="assumption">수입이 커질수록 누진세율이 올라 손익분기 경비율도 함께 올라갑니다. 연 수입 1억 원이면 경비율 60%로는 모자라 더 내야 하고, 69.7% 이상 인정받아야 환급으로 바뀝니다.</p>
+
+<h2>계산 예시</h2>
+<table>
+<tr><th>사례</th><th>조건</th><th>결과</th></tr>
+<tr><td>대표 사례</td><td>연 수입 3,600만 원 · 경비율 60% · 1인</td><td>환급 413,600원 (확정 세액 774,400원, 이미 낸 3.3% 1,188,000원)</td></tr>
+<tr><td>경비율이 낮으면</td><td>연 수입 3,600만 원 · 경비율 50% · 1인</td><td>추가 납부 71,500원 — 경비율 10%p 차이로 정산 방향이 바뀝니다</td></tr>
+<tr><td>수입이 적으면</td><td>연 수입 1,200만 원 · 경비율 80% · 1인</td><td>환급 396,000원 — 확정 세액이 0원이라 낸 3.3% 전액이 돌아옵니다</td></tr>
+<tr><td>수입이 크면</td><td>연 수입 6,000만 원 · 경비율 60% · 1인</td><td>추가 납부 269,500원 (확정 세액 2,249,500원)</td></tr>
+<tr><td>부양가족이 있으면</td><td>연 수입 3,600만 원 · 경비율 60% · 2인</td><td>환급 512,600원 — 기본공제 150만 원이 늘어 환급이 99,000원 커집니다</td></tr>
+</table>
+<p class="assumption">위 예시는 이 페이지의 계산기로 직접 계산한 값입니다. '예시 넣기' 버튼을 누르면 경비율 50% 사례와 실제 경비 대조가 함께 입력됩니다.</p>
+
+<h2>자주 묻는 질문</h2>
+<div class="faq">
+<h3>3.3%를 떼면 세금이 끝난 것 아닌가요?</h3>
+<p>아닙니다. 3.3%(소득세 3% + 지방소득세 0.3%)는 경비를 전혀 반영하지 않고 미리 낸 돈입니다. 다음 해 5월 종합소득세 신고에서 수입에서 경비와 공제를 뺀 실제 세금과 비교해, 많이 냈으면 환급받고 적게 냈으면 추가로 냅니다. 신고하지 않으면 환급도 받을 수 없습니다.</p>
+<h3>제 경비율은 몇 %인가요?</h3><p>경비율은 업종코드마다 다르고 매년 고시됩니다. 장부를 쓰지 않는 경우 직전 연도 수입이 업종별 기준보다 적으면 단순경비율, 크면 기준경비율이 적용됩니다. 국세청 홈택스에서 본인 업종코드의 단순경비율·기준경비율을 확인해 이 계산기에 넣어 보세요. 실제로 쓴 경비가 경비율로 인정되는 금액보다 많으면 장부를 써서 실제 경비로 신고하는 편이 유리할 수 있습니다.</p>
+<h3>손익분기 경비율이 뭔가요?</h3>
+<p>내 수입과 공제 조건에서 환급과 추가 납부가 갈리는 경비율입니다. 인정받는 경비율이 이 값보다 높으면 미리 낸 3.3%가 확정 세액보다 많아 환급이 나오고, 낮으면 추가로 냅니다. 예를 들어 연 수입 3,600만 원·본인 1인 기준 손익분기 경비율은 51.3%입니다.</p>
+<h3>5월 신고를 놓쳤으면 환급을 못 받나요?</h3>
+<p>법정신고기한부터 5년 안에는 기한후신고로 환급을 청구할 수 있습니다. 이미 신고했지만 공제를 빠뜨린 경우에는 경정청구를 씁니다. 환급만 받는 경우라면 기한후신고를 해도 납부할 세금이 없어 가산세 부담이 거의 없습니다.</p><h3>회사 월급과 프리랜서 수입이 둘 다 있으면 어떻게 계산하나요?</h3>
+<p>근로소득과 사업소득을 합산해 누진세율을 적용하므로 이 계산기(사업소득만 있는 경우)로는 정확히 계산할 수 없습니다. 부업 소득은 본업 소득 위에 얹혀 높은 세율 구간이 적용되는 경우가 많아, 3.3%만으로는 모자라 추가 납부가 나오는 일이 흔합니다. 합산 신고가 필요하면 홈택스 신고 화면이나 세무 전문가에게 확인하세요. 아르바이트 소득의 정산은 <a href="/tools/weekly-holiday/">주휴수당 계산기</a>에서 이어서 볼 수 있습니다.</p>
+</div>
+
+<p class="disclaimer">이 계산기는 사업소득만 있는 일반적인 경우의 예상액을 계산하는 참고 도구이며 세무 자문이 아닙니다. 다른 소득 합산, 세액공제·감면, 기준경비율의 주요경비 계산, 가산세는 반영하지 않았습니다. 업종별 경비율과 개별 신고 판단은 국세청 홈택스와 상담센터(126)로 확인하세요.</p>
+</main>
+<footer class="site-footer"><a href="/">Afterwork Lab</a> · <a href="/tools/weekly-holiday/">주휴수당 계산기</a> · <a href="/tools/severance/">퇴직금 계산기</a> · <a href="/tools/annual-leave/">연차 계산기</a></footer>
+<script src="calc.js"></script>
+<script src="page.js"></script>
+</body>
+</html>
